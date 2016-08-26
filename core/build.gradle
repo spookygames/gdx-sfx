@@ -1,0 +1,52 @@
+
+plugins {
+    id "com.github.hierynomus.license" version "0.13.1"
+}
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+dependencies {
+    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+}
+
+configurations {
+    demo.extendsFrom testRuntime
+}
+
+task demoJar(type: Jar) {
+    classifier 'demo'
+    from sourceSets.test.output
+}
+
+artifacts {
+    demo demoJar
+}
+
+apply plugin: 'maven'
+
+// Javadoc
+task javadocJar (type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// Sources
+task sourcesJar (type : Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+license {
+    header = file('../LICENSE')
+    includes(["**/*.java"])
+}

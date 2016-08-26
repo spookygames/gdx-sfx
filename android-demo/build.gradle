@@ -1,0 +1,145 @@
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.5.0'
+    }
+}
+
+plugins {
+    id "com.github.hierynomus.license" version "0.13.1"
+}
+
+apply plugin: 'android'
+
+configurations { natives }
+
+dependencies {
+    compile project(path: ':gdx-sfx-core', configuration: 'demo')
+    compile project(':gdx-sfx-android')
+    compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.1'
+
+    defaultConfig {
+        applicationId "net.spookygames.gdx.sfx"
+        minSdkVersion 8
+        targetSdkVersion 23
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
+    }
+    
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+            jniLibs.srcDirs = ['libs']
+        }
+
+        instrumentTest.setRoot('tests')
+    }
+}
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+// called every time gradle gets executed, takes the native dependencies of
+// the natives configuration, and extracts them to the proper libs/ folders
+// so they get packed with the APK.
+task copyAndroidNatives() { 
+    file("libs/armeabi/").mkdirs();
+    file("libs/armeabi-v7a/").mkdirs();
+    file("libs/x86/").mkdirs();
+
+    configurations.natives.files.each { jar ->
+        def outputDir = null
+        if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")        
+        if(jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
+        if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
+        if(outputDir != null) {
+            copy {
+                from zipTree(jar)
+                into outputDir
+                include "*.so"
+            }
+        }
+    }
+}
+
+def adb
+
+task defineAdbPath {
+    def path
+    def localProperties = project.file("../local.properties")
+    if (localProperties.exists()) {
+        Properties properties = new Properties()
+        localProperties.withInputStream { instr -> properties.load(instr) }
+        def sdkDir = properties.getProperty('sdk.dir')
+        if (sdkDir) {
+            path = sdkDir
+        } else {
+            path = "$System.env.ANDROID_HOME"
+        }
+    } else {
+        path = "$System.env.ANDROID_HOME"
+    }
+    adb = path + "/platform-tools/adb"
+}
+
+task run(type: Exec, dependsOn: defineAdbPath) {
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'net.spookygames.gdx.sfx.android/net.spookygames.gdx.sfx.android.GdxSfxDemoAndroid'
+    
+    doLast{
+        if (execResult.exitValue != 0) {
+            logger.error("It probably failed!")
+        }
+    }
+}
+
+eclipse {
+    sourceSets {
+        main {
+            java.srcDirs 'src', 'gen'
+        }
+    }
+
+    jdt {
+        sourceCompatibility = 1.6
+        targetCompatibility = 1.6
+    }
+
+    classpath {
+        plusConfigurations += [ project.configurations.compile ]        
+        containers 'org.eclipse.andmore.ANDROID_FRAMEWORK', 'org.eclipse.andmore.LIBRARIES'       
+    }
+
+    project {
+        natures 'org.eclipse.andmore.AndroidNature'
+        buildCommands.clear();
+        buildCommand "org.eclipse.andmore.ResourceManagerBuilder"
+        buildCommand "org.eclipse.andmore.PreCompilerBuilder"
+        buildCommand "org.eclipse.jdt.core.javabuilder"
+        buildCommand "org.eclipse.andmore.ApkBuilder"
+    }
+}
+
+license {
+    header = file('../LICENSE')
+    excludes(["**/*.xml", "**/R.java", "**/BuildConfig.java"])
+}

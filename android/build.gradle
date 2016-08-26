@@ -1,0 +1,113 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
+    }
+}
+
+plugins {
+    id "com.github.hierynomus.license" version "0.13.1"
+}
+
+apply plugin: 'android-library'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.1'
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 23
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
+    }
+    
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+        }
+    }
+}
+
+apply plugin: 'com.github.dcendents.android-maven'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+dependencies {
+    compile project(':gdx-sfx-core')
+    compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    destinationDir = file("../javadoc/")
+    failOnError false
+}
+
+// Javadoc
+task javadocJar (type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// Sources
+task sourcesJar (type : Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+// Thanks to http://stackoverflow.com/questions/19307341/android-library-gradle-release-jar
+android.libraryVariants.all { variant ->
+    def name = variant.buildType.name
+    if (name.equals(com.android.builder.core.BuilderConstants.DEBUG)) {
+        return; // Skip debug builds.
+    }
+    def task = project.tasks.create "jar${name.capitalize()}", Jar
+    task.dependsOn variant.javaCompile
+    task.from variant.javaCompile.destinationDir
+    artifacts.add('archives', task);
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+eclipse {
+    sourceSets {
+        main {
+            java.srcDirs 'src/main/java', 'gen'
+        }
+    }
+
+    jdt {
+        sourceCompatibility = 1.6
+        targetCompatibility = 1.6
+    }
+
+    classpath {
+        plusConfigurations += [ project.configurations.compile ]        
+        containers 'org.eclipse.andmore.ANDROID_FRAMEWORK', 'org.eclipse.andmore.LIBRARIES'       
+    }
+
+    project {
+        natures 'org.eclipse.andmore.AndroidNature'
+        buildCommands.clear();
+        buildCommand "org.eclipse.andmore.PreCompilerBuilder"
+        buildCommand "org.eclipse.jdt.core.javabuilder"
+        buildCommand "org.eclipse.andmore.ApkBuilder"
+    }
+}
+
+license {
+    header = file('../LICENSE')
+    excludes(["**/*.xml", "**/BuildConfig.java"])
+}

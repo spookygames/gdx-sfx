@@ -1,0 +1,27 @@
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.5.0'
+    }
+}
+
+allprojects {
+
+    apply plugin: 'eclipse'
+
+    group = 'net.spookygames.gdx'
+    version = '0.0.1-SNAPSHOT'
+
+    ext {
+        gdxVersion = '1.5.5'
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}

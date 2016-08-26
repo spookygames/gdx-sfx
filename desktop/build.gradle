@@ -1,0 +1,57 @@
+
+plugins {
+    id "com.github.hierynomus.license" version "0.13.1"
+}
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+dependencies {
+    compile project(':gdx-sfx-core')
+    compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+    compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    
+    testCompile project(path: ':gdx-sfx-core', configuration: 'demo')
+}
+
+// Demo
+task demo(type: Jar) {
+    baseName = 'gdx-sfx-demo'
+
+    from files(sourceSets.main.output.classesDir)
+    from sourceSets.test.output
+    from {configurations.compile.collect {zipTree(it)}}
+    from {configurations.testCompile.collect {zipTree(it)}}
+
+    manifest {
+        attributes 'Main-Class': "net.spookygames.gdx.sfx.demo.GdxSfxDemoDesktop"
+    }
+}
+
+apply plugin: 'maven'
+
+// Javadoc
+task javadocJar (type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// Sources
+task sourcesJar (type : Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+license {
+    header = file('../LICENSE')
+    includes(["**/*.java"])
+}

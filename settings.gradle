@@ -1,0 +1,5 @@
+include 'core', 'android', 'desktop', 'android-demo'
+
+rootProject.children.each { project ->
+    project.name = 'gdx-sfx-' + project.name
+}
