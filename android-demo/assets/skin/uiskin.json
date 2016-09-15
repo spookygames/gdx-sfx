@@ -189,7 +189,4 @@ com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle: {
 		backgroundOpen: select-box-down
 	}
 }
-net.spookygames.gdx.sfx.demo.FileChooser$Style: {
-    default: { pathFieldStyle: default, contentsStyle: default, titleFont: font-title, space: 10, windowStyle: dialog, scrollPaneStyle: default, buttonStyles: default }
-}
 }

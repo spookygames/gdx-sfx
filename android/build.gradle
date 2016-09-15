@@ -8,10 +8,6 @@ buildscript {
     }
 }
 
-plugins {
-    id "com.github.hierynomus.license" version "0.13.1"
-}
-
 apply plugin: 'android-library'
 
 android {
@@ -40,8 +36,10 @@ apply plugin: 'com.github.dcendents.android-maven'
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
+project.archivesBaseName = "$libName-${project.name}"
+
 dependencies {
-    compile project(':gdx-sfx-core')
+    compile project(':core')
     compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
 }
 
@@ -107,7 +105,8 @@ eclipse {
     }
 }
 
-license {
-    header = file('../LICENSE')
-    excludes(["**/*.xml", "**/BuildConfig.java"])
-}
+apply from: '../license.gradle'
+license.excludes(["**/*.xml", "**/BuildConfig.java"])
+
+apply from: '../publish.gradle'
+bintray.configurations = ['archives']

@@ -1,8 +1,4 @@
 
-plugins {
-    id "com.github.hierynomus.license" version "0.13.1"
-}
-
 apply plugin: 'java'
 
 sourceCompatibility = 1.6
@@ -11,16 +7,21 @@ targetCompatibility = 1.6
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 dependencies {
-    compile project(':gdx-sfx-core')
+    compile project(':core')
     compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
     compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     
-    testCompile project(path: ':gdx-sfx-core', configuration: 'demo')
+    testCompile project(path: ':core', configuration: 'demo')
+    testCompile "net.spookygames.gdx:gdx-nativefilechooser-desktop:1.0.0"
 }
+
+apply plugin: 'maven-publish'
+
+archivesBaseName = "$libName-${project.name}"
 
 // Demo
 task demo(type: Jar) {
-    baseName = 'gdx-sfx-demo'
+    baseName = "$libName-demo"
 
     from files(sourceSets.main.output.classesDir)
     from sourceSets.test.output
@@ -31,8 +32,6 @@ task demo(type: Jar) {
         attributes 'Main-Class': "net.spookygames.gdx.sfx.demo.GdxSfxDemoDesktop"
     }
 }
-
-apply plugin: 'maven'
 
 // Javadoc
 task javadocJar (type: Jar, dependsOn: javadoc) {
@@ -51,7 +50,20 @@ artifacts {
     archives javadocJar
 }
 
-license {
-    header = file('../LICENSE')
-    includes(["**/*.java"])
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId "$libName-${project.name}"
+            from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
 }
+
+apply from: '../license.gradle'
+license.includes(["**/*.java"])
+
+apply from: '../publish.gradle'
+bintray.publications = ['maven']

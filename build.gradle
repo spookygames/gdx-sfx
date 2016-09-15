@@ -14,14 +14,19 @@ allprojects {
     apply plugin: 'eclipse'
 
     group = 'net.spookygames.gdx'
-    version = '0.0.1-SNAPSHOT'
+    version = '1.0.0'
 
     ext {
         gdxVersion = '1.5.5'
+        libName = 'gdx-sfx'
     }
 
     repositories {
-        mavenLocal()
         mavenCentral()
+        maven { url "http://dl.bintray.com/spookygames/oss" }
     }
+}
+
+subprojects {
+    eclipse.project.name = "$libName-$name"
 }
