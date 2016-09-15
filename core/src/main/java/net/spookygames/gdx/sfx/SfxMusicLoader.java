@@ -76,10 +76,10 @@ public class SfxMusicLoader
 			title = fileName;
 
 		// Duration
-		float duration = -1;
+		float duration = -1f;
 		if (parameter != null)
 			duration = parameter.duration;
-		if (duration <= 0f)
+		if (duration <= 0f && durationResolver != null)
 			duration = durationResolver.resolveMusicDuration(music, file);
 		if (duration <= 0f)
 			duration = defaultDuration; // Default music duration

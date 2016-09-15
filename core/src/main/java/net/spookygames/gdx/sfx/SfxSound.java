@@ -24,8 +24,9 @@
 package net.spookygames.gdx.sfx;
 
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.utils.Disposable;
 
-public class SfxSound {
+public class SfxSound implements Disposable {
 
 	public final String title;
 	public final float duration; // In seconds
@@ -41,5 +42,10 @@ public class SfxSound {
 	@Override
 	public String toString() {
 		return title + " [" + duration + "s] (SfxSound)";
+	}
+
+	@Override
+	public void dispose() {
+		sound.dispose();
 	}
 }

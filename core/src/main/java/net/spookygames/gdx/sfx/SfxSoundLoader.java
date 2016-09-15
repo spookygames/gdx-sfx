@@ -79,7 +79,7 @@ public class SfxSoundLoader
 		float duration = -1;
 		if (parameter != null)
 			duration = parameter.duration;
-		if (duration <= 0f)
+		if (duration <= 0f && durationResolver != null)
 			duration = durationResolver.resolveSoundDuration(sound, file);
 		if (duration <= 0f)
 			duration = defaultDuration; // Default sound duration
