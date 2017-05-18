@@ -1,8 +1,4 @@
 
-plugins {
-    id "com.github.hierynomus.license" version "0.13.1"
-}
-
 apply plugin: 'java'
 
 sourceCompatibility = 1.6
@@ -12,7 +8,12 @@ targetCompatibility = 1.6
 
 dependencies {
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+    testCompile "net.spookygames.gdx:gdx-nativefilechooser:1.0.0"
 }
+
+apply plugin: 'maven-publish'
+
+archivesBaseName = "$libName"
 
 configurations {
     demo.extendsFrom testRuntime
@@ -26,8 +27,6 @@ task demoJar(type: Jar) {
 artifacts {
     demo demoJar
 }
-
-apply plugin: 'maven'
 
 // Javadoc
 task javadocJar (type: Jar, dependsOn: javadoc) {
@@ -46,7 +45,20 @@ artifacts {
     archives javadocJar
 }
 
-license {
-    header = file('../LICENSE')
-    includes(["**/*.java"])
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId "$libName"
+            from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
 }
+
+apply from: '../license.gradle'
+license.includes(["**/*.java"])
+
+apply from: '../publish.gradle'
+bintray.publications = ['maven']

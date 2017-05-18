@@ -23,14 +23,27 @@
  */
 package net.spookygames.gdx.sfx.demo;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.android.AndroidApplication;
+import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
-import net.spookygames.gdx.nativefilechooser.desktop.DesktopFileChooser;
-import net.spookygames.gdx.sfx.desktop.DesktopAudioDurationResolver;
+import android.os.Bundle;
+import net.spookygames.gdx.nativefilechooser.android.AndroidFileChooser;
+import net.spookygames.gdx.sfx.android.AndroidAudioDurationResolver;
+import net.spookygames.gdx.sfx.demo.GdxSfxDemo;
 
-public class GdxSfxDemoDesktop {
-	public static void main(String[] args) throws Exception {
-		DesktopAudioDurationResolver.initialize();
-		new LwjglApplication(new GdxSfxDemo(new DesktopFileChooser()), "", 800, 600);
+public class GdxSfxDemoAndroid extends AndroidApplication {
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+		config.useAccelerometer = false;
+		config.useCompass = false;
+		config.useWakelock = true;
+
+		AndroidAudioDurationResolver.initialize(this.getPackageName());
+
+		initialize(new GdxSfxDemo(new AndroidFileChooser(this)), config);
 	}
 }

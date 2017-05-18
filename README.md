@@ -1,5 +1,5 @@
 # gdx-sfx
 
-Delightful audio for libgdx.
+Don't use this version, it's crap. Really, go for version *at least* 2.0.0.
 
-Demo skin: [_shade_](https://github.com/czyzby/gdx-skins/tree/master/shade) by [Raymond "Raeleus" Buckley](http://www.badlogicgames.com/forum/viewtopic.php?f=22&t=21568).
+Thanks.

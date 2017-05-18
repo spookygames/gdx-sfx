@@ -23,6 +23,10 @@
  */
 package net.spookygames.gdx.sfx.demo;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.Locale;
+
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
@@ -59,7 +63,9 @@ import net.spookygames.gdx.sfx.SfxMusic;
 import net.spookygames.gdx.sfx.SfxMusicLoader;
 import net.spookygames.gdx.sfx.SfxMusicLoader.MusicParameters;
 import net.spookygames.gdx.sfx.SfxMusicPlayer;
-import net.spookygames.gdx.sfx.demo.GdxSfxDemo.FileChooser.Callback;
+import net.spookygames.gdx.nativefilechooser.NativeFileChooser;
+import net.spookygames.gdx.nativefilechooser.NativeFileChooserCallback;
+import net.spookygames.gdx.nativefilechooser.NativeFileChooserConfiguration;
 
 public class GdxSfxDemo implements ApplicationListener {
 
@@ -73,9 +79,9 @@ public class GdxSfxDemo implements ApplicationListener {
 
 	Preferences prefs;
 	
-	final FileChooser fileChooser;
+	final NativeFileChooser fileChooser;
 	
-	public GdxSfxDemo(FileChooser fileChooser) {
+	public GdxSfxDemo(NativeFileChooser fileChooser) {
 		super();
 		this.fileChooser = fileChooser;
 	}
@@ -125,12 +131,35 @@ public class GdxSfxDemo implements ApplicationListener {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				fileChooser.chooseFile(Gdx.files.absolute(prefs.getString("last",
+				
+				NativeFileChooserConfiguration conf = new NativeFileChooserConfiguration();
+				conf.directory = Gdx.files.absolute(prefs.getString("last",
 						Gdx.files.isExternalStorageAvailable() ? 
-							Gdx.files.getExternalStoragePath()
-							: (Gdx.files.isLocalStorageAvailable() ?
-									Gdx.files.getLocalStoragePath()
-									: System.getProperty("user.home")))), new Callback() {
+								Gdx.files.getExternalStoragePath()
+								: (Gdx.files.isLocalStorageAvailable() ?
+										Gdx.files.getLocalStoragePath()
+										: System.getProperty("user.home"))));
+				conf.nameFilter = new FilenameFilter() {
+					final String[] extensions = { "wav", "mp3", "ogg" };
+
+					@Override
+					public boolean accept(File dir, String name) {
+						int i = name.lastIndexOf('.');
+						if (i > 0 && i < name.length() - 1) {
+							String desiredExtension = name.substring(i + 1).toLowerCase(Locale.ENGLISH);
+							for (String extension : extensions) {
+								if (desiredExtension.equals(extension)) {
+									return true;
+								}
+							}
+						}
+						return false;
+					}
+				};
+				conf.mimeFilter = "audio/*";
+				conf.title = "Choose audio file";
+				
+				fileChooser.chooseFile(conf, new NativeFileChooserCallback() {
 					@Override
 					public void onFileChosen(FileHandle file) {
 						if(file == null)
@@ -159,6 +188,14 @@ public class GdxSfxDemo implements ApplicationListener {
 						};
 
 						assetManager.load(new AssetDescriptor<SfxMusic>(file, SfxMusic.class, parameters));
+					}
+
+					@Override
+					public void onCancellation() {
+					}
+
+					@Override
+					public void onError(Exception exception) {
 					}
 				});
 			}
@@ -484,15 +521,4 @@ public class GdxSfxDemo implements ApplicationListener {
 
 	}
 	
-	public interface FileChooser {
-
-		void chooseFile(FileHandle directory, Callback callback);
-
-		public interface Callback {
-
-			void onFileChosen(FileHandle file);
-
-		}
-
-	}
 }
