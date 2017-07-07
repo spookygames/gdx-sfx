@@ -23,20 +23,65 @@
  */
 package net.spookygames.gdx.sfx;
 
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.MathUtils;
 
-public interface MusicDurationResolver {
+public class FadeOut extends SfxMusicEffect {
 
-	/**
-	 * Get duration of given music in seconds.
-	 * 
-	 * @param music
-	 *            Given music
-	 * @param musicFile
-	 *            File of given music (may help)
-	 * @return The duration of given music in seconds
-	 */
-	public float resolveMusicDuration(Music music, FileHandle musicFile);
+	private float baseVolume;
+	private float beginning;
+	
+	@Override
+	public void setMusic(SfxMusic music) {
+		super.setMusic(music);
+		if (music != null)
+			beginning = music.getDuration() - this.getDuration();
+	}
+
+	@Override
+	protected void begin() {
+		super.begin();
+		baseVolume = -1f;
+	}
+
+	@Override
+	protected boolean apply(float position) {
+		if (position < beginning) {
+			return false;
+		} else {
+			float ratio = (position - beginning) / getDuration();
+			if (ratio <= 1.0f) {
+				float target = this.baseVolume;
+				if (target < 0f)
+					this.baseVolume = target = music.getVolume();
+				music.setVolume(MathUtils.clamp(getInterpolation().apply(target, 0f, ratio), 0f, 1f));
+				return false;
+			} else {
+				return true;
+			}
+		}
+
+	}
+
+	@Override
+	public void stop(float position) {
+		beginning = position;
+	}
+
+	@Override
+	protected void end() {
+		super.end();
+		music.setVolume(0f);
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		beginning = 0f;
+	}
+	
+	@Override
+	public void restart() {
+		super.restart();
+	}
 
 }

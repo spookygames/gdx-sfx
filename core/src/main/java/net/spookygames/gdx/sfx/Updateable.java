@@ -23,20 +23,8 @@
  */
 package net.spookygames.gdx.sfx;
 
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.files.FileHandle;
+public interface Updateable {
 
-public interface MusicDurationResolver {
-
-	/**
-	 * Get duration of given music in seconds.
-	 * 
-	 * @param music
-	 *            Given music
-	 * @param musicFile
-	 *            File of given music (may help)
-	 * @return The duration of given music in seconds
-	 */
-	public float resolveMusicDuration(Music music, FileHandle musicFile);
+	boolean update(float deltaTime);
 
 }

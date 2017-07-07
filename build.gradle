@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.android.tools.build:gradle:2.3.2'
     }
 }
 
@@ -14,10 +14,10 @@ allprojects {
     apply plugin: 'eclipse'
 
     group = 'net.spookygames.gdx'
-    version = '1.0.0'
+    version = '2.0.0-SNAPSHOT'
 
     ext {
-        gdxVersion = '1.5.5'
+        gdxVersion = '1.8.0'
         libName = 'gdx-sfx'
     }
 

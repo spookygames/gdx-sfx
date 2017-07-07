@@ -23,20 +23,43 @@
  */
 package net.spookygames.gdx.sfx;
 
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.Pools;
 
-public interface MusicDurationResolver {
+public class Effects {
+	
+	static {
+		Pools.set(FadeIn.class, new Pool<FadeIn>() { @Override protected FadeIn newObject() { return new FadeIn(); } });
+		Pools.set(FadeOut.class, new Pool<FadeOut>() { @Override protected FadeOut newObject() { return new FadeOut(); } });
+	}
 
-	/**
-	 * Get duration of given music in seconds.
-	 * 
-	 * @param music
-	 *            Given music
-	 * @param musicFile
-	 *            File of given music (may help)
-	 * @return The duration of given music in seconds
-	 */
-	public float resolveMusicDuration(Music music, FileHandle musicFile);
+	static public <T extends SfxMusicEffect> T effect(Class<T> type) {
+		Pool<T> pool = Pools.get(type);
+		T effect = pool.obtain();
+		effect.setPool(pool);
+		return effect;
+	}
 
+	static public FadeIn fadeIn(float duration) {
+		return fadeIn(duration, null);
+	}
+
+	static public FadeIn fadeIn(float duration, Interpolation interpolation) {
+		FadeIn effect = effect(FadeIn.class);
+		effect.setDuration(duration);
+		effect.setInterpolation(interpolation);
+		return effect;
+	}
+
+	static public FadeOut fadeOut(float duration) {
+		return fadeOut(duration, null);
+	}
+
+	static public FadeOut fadeOut(float duration, Interpolation interpolation) {
+		FadeOut effect = effect(FadeOut.class);
+		effect.setDuration(duration);
+		effect.setInterpolation(interpolation);
+		return effect;
+	}
 }

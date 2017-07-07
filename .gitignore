@@ -99,9 +99,13 @@ proguard/
 captures/
 
 # Intellij
+android-demo/libs/
+gen/
+*.ipr
+*.iws
 *.iml
-.idea/workspace.xml
-.idea/libraries
+.idea/
+out/
 
 # Keystore files
 *.jks

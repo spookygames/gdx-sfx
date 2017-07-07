@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Spooky Games
+ * Copyright (c) 2016-2017 Spooky Games
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -84,7 +84,17 @@ public class SfxSoundLoader
 		if (duration <= 0f)
 			duration = defaultDuration; // Default sound duration
 
-		return new SfxSound(sound, title, duration);
+		// pitch shifting
+		float pitchRange = 0f;
+		if (parameter != null)
+			pitchRange = parameter.pitchRange;
+		if (pitchRange > 1f)
+			pitchRange = 1f;
+		
+		if (pitchRange <= 0f)
+			return new SfxSoundWrapper(sound, title, duration);
+		else
+			return new SfxPitchShiftingSoundWrapper(sound, title, duration, pitchRange);
 	}
 
 	@Override
@@ -95,6 +105,7 @@ public class SfxSoundLoader
 	public static class SoundParameters extends AssetLoaderParameters<SfxSound> {
 		public String title = null;
 		public float duration = -1f;
+		public float pitchRange = 0f;
 	}
 
 }

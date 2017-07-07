@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.android.tools.build:gradle:2.3.2'
     }
 }
 
@@ -14,6 +14,7 @@ apply plugin: 'android'
 configurations { natives }
 
 dependencies {
+    compile project(':core')
     compile project(path: ':core', configuration: 'demo')
     compile project(':android')
     compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
@@ -25,7 +26,7 @@ dependencies {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.1'
+    buildToolsVersion '25'
 
     defaultConfig {
         applicationId "net.spookygames.gdx.sfx"

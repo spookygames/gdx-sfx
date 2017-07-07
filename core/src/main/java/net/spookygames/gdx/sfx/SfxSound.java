@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Spooky Games
+ * Copyright (c) 2016-2017 Spooky Games
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,28 +24,7 @@
 package net.spookygames.gdx.sfx;
 
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.utils.Disposable;
 
-public class SfxSound implements Disposable {
+public interface SfxSound extends Sound, SfxAudio {
 
-	public final String title;
-	public final float duration; // In seconds
-
-	final Sound sound;
-
-	public SfxSound(Sound wrappedSound, String title, float duration) {
-		this.title = title;
-		this.duration = duration;
-		this.sound = wrappedSound;
-	}
-
-	@Override
-	public String toString() {
-		return title + " [" + duration + "s] (SfxSound)";
-	}
-
-	@Override
-	public void dispose() {
-		sound.dispose();
-	}
 }

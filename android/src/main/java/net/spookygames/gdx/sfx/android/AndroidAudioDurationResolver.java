@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Spooky Games
+ * Copyright (c) 2016-2017 Spooky Games
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,16 +23,20 @@
  */
 package net.spookygames.gdx.sfx.android;
 
+import java.io.FileDescriptor;
+import java.io.IOException;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.backends.android.AndroidFileHandle;
 import com.badlogic.gdx.backends.android.AndroidMusic;
 import com.badlogic.gdx.files.FileHandle;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.res.AssetFileDescriptor;
 import android.media.MediaMetadataRetriever;
-import android.net.Uri;
 import android.os.Build;
 import net.spookygames.gdx.sfx.MusicDurationResolver;
 import net.spookygames.gdx.sfx.SfxMusicLoader;
@@ -40,13 +44,6 @@ import net.spookygames.gdx.sfx.SfxSoundLoader;
 import net.spookygames.gdx.sfx.SoundDurationResolver;
 
 public class AndroidAudioDurationResolver implements MusicDurationResolver, SoundDurationResolver {
-
-	private final String namespace;
-
-	public AndroidAudioDurationResolver(String namespace) {
-		super();
-		this.namespace = namespace;
-	}
 
 	@Override
 	public float resolveMusicDuration(Music music, FileHandle musicFile) {
@@ -62,7 +59,7 @@ public class AndroidAudioDurationResolver implements MusicDurationResolver, Soun
 		if (Build.VERSION.SDK_INT >= 10) {
 			try {
 				return sdk10Duration(soundFile);
-			} catch (IllegalArgumentException ex) {
+			} catch (IOException ex) {
 				Gdx.app.error("gdx-sfx", "Unable to resolve duration of sound file " + soundFile.toString(), ex);
 			}
 		}
@@ -71,12 +68,22 @@ public class AndroidAudioDurationResolver implements MusicDurationResolver, Soun
 	}
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD_MR1)
-	private float sdk10Duration(FileHandle soundFile) {
-		String mediaPath = Uri.parse("android.resource://" + namespace + "/raw/" + soundFile.path()).getPath();
-		MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+	private float sdk10Duration(FileHandle soundFile) throws IOException {
+
 		float duration = -1f;
+
+		MediaMetadataRetriever mmr = new MediaMetadataRetriever();
 		try {
-			mmr.setDataSource(mediaPath);
+			AndroidFileHandle androidFile = (AndroidFileHandle) soundFile;
+			AssetFileDescriptor fd = androidFile.getAssetFileDescriptor();
+			FileDescriptor descriptor = fd.getFileDescriptor();
+
+			if (fd.getDeclaredLength() < 0) {
+				mmr.setDataSource(descriptor);
+			} else {
+				mmr.setDataSource(descriptor, fd.getStartOffset(), fd.getDeclaredLength());
+			}
+
 			String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
 			if (durationStr != null) {
 				duration = Integer.parseInt(durationStr) / 1000f;
@@ -84,11 +91,12 @@ public class AndroidAudioDurationResolver implements MusicDurationResolver, Soun
 		} finally {
 			mmr.release();
 		}
+
 		return duration;
 	}
 
-	public static void initialize(String namespace) {
-		AndroidAudioDurationResolver resolver = new AndroidAudioDurationResolver(namespace);
+	public static void initialize() {
+		AndroidAudioDurationResolver resolver = new AndroidAudioDurationResolver();
 		SfxMusicLoader.setDurationResolver(resolver);
 		SfxSoundLoader.setDurationResolver(resolver);
 	}

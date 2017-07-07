@@ -23,20 +23,39 @@
  */
 package net.spookygames.gdx.sfx;
 
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.MathUtils;
 
-public interface MusicDurationResolver {
+public class FadeIn extends SfxMusicEffect {
 
-	/**
-	 * Get duration of given music in seconds.
-	 * 
-	 * @param music
-	 *            Given music
-	 * @param musicFile
-	 *            File of given music (may help)
-	 * @return The duration of given music in seconds
-	 */
-	public float resolveMusicDuration(Music music, FileHandle musicFile);
+	private float baseVolume;
+
+	@Override
+	protected void begin() {
+		super.begin();
+		baseVolume = music.getVolume();
+	}
+
+	@Override
+	protected boolean apply(float position) {
+		float ratio = position / getDuration();
+		if (ratio <= 1.0f) {
+			music.setVolume(MathUtils.clamp(getInterpolation().apply(0f, baseVolume, ratio), 0f, 1f));
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	@Override
+	protected void end() {
+		super.end();
+		music.setVolume(baseVolume);
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		baseVolume = 0f;
+	}
 
 }

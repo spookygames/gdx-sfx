@@ -1,18 +1,9 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
-    }
-}
 
 apply plugin: 'android-library'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.1'
+    buildToolsVersion '25'
 
     defaultConfig {
         minSdkVersion 8
@@ -31,8 +22,6 @@ android {
     }
 }
 
-apply plugin: 'com.github.dcendents.android-maven'
-
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
@@ -42,6 +31,8 @@ dependencies {
     compile project(':core')
     compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
 }
+
+apply plugin: 'maven-publish'
 
 task javadoc(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
@@ -62,21 +53,48 @@ task sourcesJar (type : Jar) {
     from android.sourceSets.main.java.srcDirs
 }
 
-// Thanks to http://stackoverflow.com/questions/19307341/android-library-gradle-release-jar
-android.libraryVariants.all { variant ->
-    def name = variant.buildType.name
-    if (name.equals(com.android.builder.core.BuilderConstants.DEBUG)) {
-        return; // Skip debug builds.
-    }
-    def task = project.tasks.create "jar${name.capitalize()}", Jar
-    task.dependsOn variant.javaCompile
-    task.from variant.javaCompile.destinationDir
-    artifacts.add('archives', task);
-}
+publishing {
+    publications {
+        maven(MavenPublication) {
 
-artifacts {
-    archives sourcesJar
-    archives javadocJar
+            artifactId "$libName-${project.name}"
+
+            artifact bundleRelease
+            artifact javadocJar
+            artifact sourcesJar
+
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                // List all compile dependencies and write to POM
+                configurations.compile.getAllDependencies().each { Dependency dep ->
+                    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
+                        return // ignore invalid dependencies
+
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', dep.group)
+                    dependencyNode.appendNode('artifactId', dep.name == "core" ? "$libName" : dep.name)	// Ugly!
+                    dependencyNode.appendNode('version', dep.version)
+
+                    if (!dep.transitive) {
+                        // If this dependency is transitive, we should force exclude all its dependencies them from the POM
+                        def exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                        exclusionNode.appendNode('groupId', '*')
+                        exclusionNode.appendNode('artifactId', '*')
+                    } else if (!dep.properties.excludeRules.empty) {
+                        // Otherwise add specified exclude rules
+                        def exclusionsNode = dependencyNode.appendNode('exclusions')
+                        dep.properties.excludeRules.each { ExcludeRule rule ->
+                            def exclusionNode = exclusionsNode.appendNode('exclusion')
+                            exclusionNode.appendNode('groupId', rule.group ?: '*')
+                            exclusionNode.appendNode('artifactId', rule.module ?: '*')
+                        }
+                    }
+                }
+            }
+
+        }
+    }
 }
 
 eclipse {
