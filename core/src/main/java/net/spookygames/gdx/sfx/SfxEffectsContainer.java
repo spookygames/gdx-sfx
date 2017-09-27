@@ -28,13 +28,13 @@ import com.badlogic.gdx.utils.Array;
 public interface SfxEffectsContainer {
 
 	Array<SfxMusicEffect> getEffects();
-	
-	boolean hasEffects ();
-	
+
+	boolean hasEffects();
+
 	void addEffect(SfxMusicEffect effect);
-	
+
 	void removeEffect(SfxMusicEffect effect);
-	
+
 	void clearEffects();
 
 }

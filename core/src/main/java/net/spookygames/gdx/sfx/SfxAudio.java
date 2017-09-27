@@ -25,9 +25,26 @@ package net.spookygames.gdx.sfx;
 
 public interface SfxAudio {
 
+	/**
+	 * Get the title of this SfxAudio instance. Information purpose only.
+	 * 
+	 * @return the title of this instance
+	 */
 	String getTitle();
 
+	/**
+	 * Get the duration of this SfxAudio instance. Very important for effects
+	 * and spatialization.
+	 * 
+	 * @return the duration of this SfxAudio instance
+	 */
 	float getDuration();
 
+	/**
+	 * Get the panning of this SfxAudio instance. Added here as there is no
+	 * unified way to get panning between gdx's Sound and Music.
+	 * 
+	 * @return the panning of this SfxAudio instance
+	 */
 	float getPan();
 }
