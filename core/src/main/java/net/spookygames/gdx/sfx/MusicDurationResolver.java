@@ -37,6 +37,6 @@ public interface MusicDurationResolver {
 	 *            File of given music (may help)
 	 * @return The duration of given music in seconds
 	 */
-	public float resolveMusicDuration(Music music, FileHandle musicFile);
+	float resolveMusicDuration(Music music, FileHandle musicFile);
 
 }

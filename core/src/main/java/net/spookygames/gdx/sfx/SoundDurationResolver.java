@@ -37,6 +37,6 @@ public interface SoundDurationResolver {
 	 *            File of given sound (may help)
 	 * @return The duration of given sound in seconds
 	 */
-	public float resolveSoundDuration(Sound sound, FileHandle soundFile);
+	float resolveSoundDuration(Sound sound, FileHandle soundFile);
 
 }
