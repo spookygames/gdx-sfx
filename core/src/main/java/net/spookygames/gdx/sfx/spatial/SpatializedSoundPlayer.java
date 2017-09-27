@@ -63,6 +63,10 @@ public class SpatializedSoundPlayer<T> {
 		this.volume = volume;
 	}
 
+	public long play(T position, SfxSound sound) {
+		return play(position, sound, 1f, false);
+	}
+
 	public long play(T position, SfxSound sound, float pitch, boolean looping) {
 
 		SpatializedSound<T> instance = pool.obtain();
