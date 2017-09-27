@@ -31,6 +31,6 @@ import net.spookygames.gdx.sfx.desktop.DesktopAudioDurationResolver;
 public class GdxSfxDemoDesktop {
 	public static void main(String[] args) throws Exception {
 		DesktopAudioDurationResolver.initialize();
-		new LwjglApplication(new GdxSfxDemo(new DesktopFileChooser()), "", 800, 600);
+		new LwjglApplication(new GdxSfxDemo(new DesktopFileChooser()), "", 1200, 800);
 	}
 }

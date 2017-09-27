@@ -84,6 +84,8 @@ public class GdxSfxDemo implements ApplicationListener {
 
 	Preferences prefs;
 	
+	Button playPauseButton;
+	
 	final NativeFileChooser fileChooser;
 	
 	public GdxSfxDemo(NativeFileChooser fileChooser) {
@@ -126,8 +128,7 @@ public class GdxSfxDemo implements ApplicationListener {
 
 		ScrollPane scrollablePlaylistTable = new ScrollPane(playlistGroup, skin);
 		scrollablePlaylistTable.setScrollingDisabled(true, false);
-
-		playlistGroup.addActor(invitationLabel);
+		scrollablePlaylistTable.setOverscroll(false, false);
 
 		/********/
 		/* File */
@@ -211,16 +212,17 @@ public class GdxSfxDemo implements ApplicationListener {
 		/* Control */
 		/***********/
 
-		Table controlTable = new Table(skin);
-
-		final Button playPauseButton = new Button(skin, "music");
+		playPauseButton = new Button(skin, "music");
 		playPauseButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (playPauseButton.isChecked()) {
+					if (player.isEmpty())
+						playPauseButton.setChecked(false);
 					player.play();
 				} else {
-					player.pause();
+					if (player.isPlaying())
+						player.pause();
 				}
 			}
 		});
@@ -351,28 +353,36 @@ public class GdxSfxDemo implements ApplicationListener {
 		fadeCheckBox.setChecked(true);
 		fadeTable.setVisible(true);
 
-		controlTable.defaults().padTop(4f);
-		controlTable.row().colspan(3);
-		controlTable.add(repeatCheckBox).left();
-		controlTable.row().colspan(3);
-		controlTable.add(fadeCheckBox).left();
-		controlTable.row().colspan(3);
-		controlTable.add(fadeTable);
-		controlTable.row();
-		controlTable.add("Pan");
-		controlTable.add(panSlider).colspan(2);
-		controlTable.row().colspan(3);
-		controlTable.add().expand();
-		controlTable.row();
-		controlTable.add(previousButton).right();
-		controlTable.add(playPauseButton);
-		controlTable.add(nextButton).left();
-		controlTable.row();
-		controlTable.add("Volume");
-		controlTable.add(volumeSlider).colspan(2);
-		controlTable.row();
-		controlTable.add("Mute");
-		controlTable.add(muteButton).colspan(2).left();
+		Table controlTable = new Table(skin);
+		
+		Table leftControlTable = new Table(skin);
+		leftControlTable.defaults().padTop(4f);
+		leftControlTable.row();
+		leftControlTable.add(fileFinder).colspan(3);
+		leftControlTable.row();
+		leftControlTable.add(previousButton).right();
+		leftControlTable.add(playPauseButton);
+		leftControlTable.add(nextButton).left();
+		leftControlTable.row();
+		leftControlTable.add("Volume").padRight(10f).left();
+		leftControlTable.add(volumeSlider);
+		leftControlTable.add(muteButton);
+		leftControlTable.row();
+		leftControlTable.add("Pan").left();
+		leftControlTable.add(panSlider).colspan(2).left();
+		
+		Table rightControlTable = new Table(skin);
+		rightControlTable.defaults().padTop(12f).left();
+		rightControlTable.row();
+		rightControlTable.add(repeatCheckBox).colspan(2);
+		rightControlTable.row();
+		rightControlTable.add(fadeCheckBox).colspan(2);
+		rightControlTable.row();
+		rightControlTable.add(fadeTable).colspan(2);
+
+		controlTable.row().growX();
+		controlTable.add(leftControlTable);
+		controlTable.add(rightControlTable);
 
 		/*********/
 		/* Debug */
@@ -390,23 +400,16 @@ public class GdxSfxDemo implements ApplicationListener {
 		/* Stage setup */
 		/***************/
 
-		Table leftTable = new Table(skin);
-		leftTable.row();
-		leftTable.add(scrollablePlaylistTable).expand().fillX().top();
-		leftTable.row();
-		leftTable.add(debugLabel).expandX().left().padLeft(30f).padTop(8f);
-
-		Table rightTable = new Table(skin);
-		rightTable.row();
-		rightTable.add(controlTable).expandY().fill();
-		rightTable.row();
-		rightTable.add(fileFinder).padTop(10f);
-
 		Table rootTable = new Table(skin);
 		rootTable.setFillParent(true);
 		rootTable.row();
-		rootTable.add(leftTable).expand().fill();
-		rootTable.add(rightTable).expandY().fill().padTop(25f).padLeft(8f);
+		rootTable.add(invitationLabel).growX().padTop(20f);
+		rootTable.row();
+		rootTable.add(scrollablePlaylistTable).expand().fillX().top();
+		rootTable.row();
+		rootTable.add(controlTable).growX();
+		rootTable.row();
+		rootTable.add(debugLabel).growX().padTop(20f).padLeft(120f).padBottom(12f);
 		
 		stage = new Stage(new ScreenViewport(camera), batch);
 		stage.addActor(rootTable);
@@ -427,7 +430,8 @@ public class GdxSfxDemo implements ApplicationListener {
 		Gdx.graphics.setTitle("gdx-sfx -- Music player demo -- " + player.getTitle());
 
 		assetManager.update();
-		player.update(delta);
+		if (player.update(delta))
+			playPauseButton.setChecked(false);
 		stage.act(delta);
 		stage.draw();
 	}
@@ -478,6 +482,7 @@ public class GdxSfxDemo implements ApplicationListener {
 			playingLabel = new Label(">", skin, "title");
 			titleLabel = new Label(music.getTitle(), skin);
 			titleLabel.setAlignment(Align.left);
+			titleLabel.setEllipsis(true);
 			timeProgress = new ProgressBar(0f, music.getDuration(), 0.1f, false, skin);
 			timeLabel = new Label("", skin);
 			timeLabel.setAlignment(Align.center);
@@ -490,9 +495,9 @@ public class GdxSfxDemo implements ApplicationListener {
 			row().pad(2f);
 			add(playingLabel);
 			add(titleLabel).expandX().fillX();
-			stack(timeProgress, timeLabel);
-			add(volumeLevel);
-			add(panLevel);
+			stack(timeProgress, timeLabel).padLeft(20f).padRight(20f);
+			add(volumeLevel).width(80f);
+			add(panLevel).width(80f);
 			add(removeButton);
 		}
 
