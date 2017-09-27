@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Spooky Games
+ * Copyright (c) 2016-2017 Spooky Games
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -84,7 +84,7 @@ public class SfxMusicLoader
 		if (duration <= 0f)
 			duration = defaultDuration; // Default music duration
 
-		return new SfxMusic(music, title, duration);
+		return new SfxMusicWrapper(music, title, duration);
 	}
 
 	@Override

@@ -21,16 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.spookygames.gdx.sfx.demo;
+package net.spookygames.gdx.sfx;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+public interface SfxAudio {
 
-import net.spookygames.gdx.nativefilechooser.desktop.DesktopFileChooser;
-import net.spookygames.gdx.sfx.desktop.DesktopAudioDurationResolver;
+	/**
+	 * Get the title of this SfxAudio instance. Information purpose only.
+	 * 
+	 * @return the title of this instance
+	 */
+	String getTitle();
 
-public class GdxSfxDemoDesktop {
-	public static void main(String[] args) throws Exception {
-		DesktopAudioDurationResolver.initialize();
-		new LwjglApplication(new GdxSfxDemo(new DesktopFileChooser()), "", 1200, 800);
-	}
+	/**
+	 * Get the duration of this SfxAudio instance. Very important for effects
+	 * and spatialization.
+	 * 
+	 * @return the duration of this SfxAudio instance
+	 */
+	float getDuration();
+
+	/**
+	 * Get the panning of this SfxAudio instance. Added here as there is no
+	 * unified way to get panning between gdx's Sound and Music.
+	 * 
+	 * @return the panning of this SfxAudio instance
+	 */
+	float getPan();
 }

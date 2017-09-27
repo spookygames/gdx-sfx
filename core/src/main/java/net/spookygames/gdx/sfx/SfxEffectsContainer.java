@@ -21,16 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.spookygames.gdx.sfx.demo;
+package net.spookygames.gdx.sfx;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.utils.Array;
 
-import net.spookygames.gdx.nativefilechooser.desktop.DesktopFileChooser;
-import net.spookygames.gdx.sfx.desktop.DesktopAudioDurationResolver;
+public interface SfxEffectsContainer {
 
-public class GdxSfxDemoDesktop {
-	public static void main(String[] args) throws Exception {
-		DesktopAudioDurationResolver.initialize();
-		new LwjglApplication(new GdxSfxDemo(new DesktopFileChooser()), "", 1200, 800);
-	}
+	Array<SfxMusicEffect> getEffects();
+
+	boolean hasEffects();
+
+	void addEffect(SfxMusicEffect effect);
+
+	void removeEffect(SfxMusicEffect effect);
+
+	void clearEffects();
+
 }

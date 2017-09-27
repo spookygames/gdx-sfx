@@ -21,16 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.spookygames.gdx.sfx.demo;
+package net.spookygames.gdx.sfx.spatial;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.audio.Sound;
 
-import net.spookygames.gdx.nativefilechooser.desktop.DesktopFileChooser;
-import net.spookygames.gdx.sfx.desktop.DesktopAudioDurationResolver;
+public interface Spatializer<T> {
 
-public class GdxSfxDemoDesktop {
-	public static void main(String[] args) throws Exception {
-		DesktopAudioDurationResolver.initialize();
-		new LwjglApplication(new GdxSfxDemo(new DesktopFileChooser()), "", 1200, 800);
-	}
+	/**
+	 * Apply spatialization to a given sound instance
+	 * 
+	 * @param id
+	 *            the id of the sound instance
+	 * @param position
+	 *            the position of this sound in space
+	 * @param sound
+	 *            the sound to apply spatialization to
+	 * @param nominalVolume
+	 *            the volume this sound would be at without spatialization
+	 */
+	void spatialize(long id, T position, Sound sound, float nominalVolume);
+
 }

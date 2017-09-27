@@ -21,16 +21,67 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.spookygames.gdx.sfx.demo;
+package net.spookygames.gdx.sfx;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.math.MathUtils;
 
-import net.spookygames.gdx.nativefilechooser.desktop.DesktopFileChooser;
-import net.spookygames.gdx.sfx.desktop.DesktopAudioDurationResolver;
+public class FadeOut extends SfxMusicEffect {
 
-public class GdxSfxDemoDesktop {
-	public static void main(String[] args) throws Exception {
-		DesktopAudioDurationResolver.initialize();
-		new LwjglApplication(new GdxSfxDemo(new DesktopFileChooser()), "", 1200, 800);
+	private float baseVolume;
+	private float beginning;
+	
+	@Override
+	public void setMusic(SfxMusic music) {
+		super.setMusic(music);
+		if (music != null)
+			beginning = music.getDuration() - this.getDuration();
 	}
+
+	@Override
+	protected void begin() {
+		super.begin();
+		baseVolume = -1f;
+	}
+
+	@Override
+	protected boolean apply(float position) {
+		if (position < beginning) {
+			return false;
+		} else {
+			float ratio = (position - beginning) / getDuration();
+			if (ratio <= 1.0f) {
+				float target = this.baseVolume;
+				if (target < 0f)
+					this.baseVolume = target = music.getVolume();
+				music.setVolume(MathUtils.clamp(getInterpolation().apply(target, 0f, ratio), 0f, 1f));
+				return false;
+			} else {
+				return true;
+			}
+		}
+
+	}
+
+	@Override
+	public void stop(float position) {
+		beginning = position;
+	}
+
+	@Override
+	protected void end() {
+		super.end();
+		music.setVolume(0f);
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		beginning = 0f;
+	}
+	
+	@Override
+	public void restart() {
+		super.restart();
+	}
+
 }

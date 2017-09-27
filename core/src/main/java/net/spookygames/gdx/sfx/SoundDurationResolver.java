@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Spooky Games
+ * Copyright (c) 2016-2017 Spooky Games
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,6 @@ public interface SoundDurationResolver {
 	 *            File of given sound (may help)
 	 * @return The duration of given sound in seconds
 	 */
-	public float resolveSoundDuration(Sound sound, FileHandle soundFile);
+	float resolveSoundDuration(Sound sound, FileHandle soundFile);
 
 }

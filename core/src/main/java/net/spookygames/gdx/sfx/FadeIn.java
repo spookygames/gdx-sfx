@@ -21,16 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.spookygames.gdx.sfx.demo;
+package net.spookygames.gdx.sfx;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.math.MathUtils;
 
-import net.spookygames.gdx.nativefilechooser.desktop.DesktopFileChooser;
-import net.spookygames.gdx.sfx.desktop.DesktopAudioDurationResolver;
+public class FadeIn extends SfxMusicEffect {
 
-public class GdxSfxDemoDesktop {
-	public static void main(String[] args) throws Exception {
-		DesktopAudioDurationResolver.initialize();
-		new LwjglApplication(new GdxSfxDemo(new DesktopFileChooser()), "", 1200, 800);
+	private float baseVolume;
+
+	@Override
+	protected void begin() {
+		super.begin();
+		baseVolume = music.getVolume();
 	}
+
+	@Override
+	protected boolean apply(float position) {
+		float ratio = position / getDuration();
+		if (ratio <= 1.0f) {
+			music.setVolume(MathUtils.clamp(getInterpolation().apply(0f, baseVolume, ratio), 0f, 1f));
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	@Override
+	protected void end() {
+		super.end();
+		music.setVolume(baseVolume);
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		baseVolume = 0f;
+	}
+
 }

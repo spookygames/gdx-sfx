@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Spooky Games
+ * Copyright (c) 2016-2017 Spooky Games
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -54,30 +54,37 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
-import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import net.spookygames.gdx.sfx.SfxMusic;
-import net.spookygames.gdx.sfx.SfxMusicLoader;
-import net.spookygames.gdx.sfx.SfxMusicLoader.MusicParameters;
-import net.spookygames.gdx.sfx.SfxMusicPlayer;
 import net.spookygames.gdx.nativefilechooser.NativeFileChooser;
 import net.spookygames.gdx.nativefilechooser.NativeFileChooserCallback;
 import net.spookygames.gdx.nativefilechooser.NativeFileChooserConfiguration;
+import net.spookygames.gdx.sfx.FadeIn;
+import net.spookygames.gdx.sfx.FadeOut;
+import net.spookygames.gdx.sfx.SfxMusic;
+import net.spookygames.gdx.sfx.SfxMusicLoader;
+import net.spookygames.gdx.sfx.SfxMusicLoader.MusicParameters;
+import net.spookygames.gdx.sfx.SfxMusicPlaylist;
 
 public class GdxSfxDemo implements ApplicationListener {
 
 	SpriteBatch batch;
-
-	SfxMusicPlayer player;
+	
 	AssetManager assetManager;
+
+	SfxMusicPlaylist player;
+	FadeIn fadein;
+	FadeOut fadeout;
 
 	Stage stage;
 	Skin skin;
 
 	Preferences prefs;
+	
+	Button playPauseButton;
 	
 	final NativeFileChooser fileChooser;
 	
@@ -105,7 +112,9 @@ public class GdxSfxDemo implements ApplicationListener {
 
 		skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
 
-		player = new SfxMusicPlayer();
+		player = new SfxMusicPlaylist();
+		fadein = new FadeIn();
+		fadeout = new FadeOut();
 
 		/************/
 		/* Playlist */
@@ -119,8 +128,7 @@ public class GdxSfxDemo implements ApplicationListener {
 
 		ScrollPane scrollablePlaylistTable = new ScrollPane(playlistGroup, skin);
 		scrollablePlaylistTable.setScrollingDisabled(true, false);
-
-		playlistGroup.addActor(invitationLabel);
+		scrollablePlaylistTable.setOverscroll(false, false);
 
 		/********/
 		/* File */
@@ -173,17 +181,16 @@ public class GdxSfxDemo implements ApplicationListener {
 							public void finishedLoading(AssetManager assetManager, String fileName, 
 									@SuppressWarnings("rawtypes") Class type) {
 								final SfxMusic music = assetManager.get(fileName, SfxMusic.class);
-								if(player.addToPlaylist(music)) {
-									final MusicWidget widget = new MusicWidget(skin, music);
-									playlistGroup.addActor(widget);
-									widget.removeButton.addListener(new ChangeListener() {
-										@Override
-										public void changed(ChangeEvent event, Actor actor) {
-											if(player.removeFromPlaylist(music))
-												widget.remove();
-										}
-									});
-								}
+								player.addMusic(music);
+								final MusicWidget widget = new MusicWidget(skin, music);
+								playlistGroup.addActor(widget);
+								widget.removeButton.addListener(new ChangeListener() {
+									@Override
+									public void changed(ChangeEvent event, Actor actor) {
+										if(player.removeMusic(music))
+											widget.remove();
+									}
+								});
 							}
 						};
 
@@ -205,16 +212,17 @@ public class GdxSfxDemo implements ApplicationListener {
 		/* Control */
 		/***********/
 
-		Table controlTable = new Table(skin);
-
-		final Button playPauseButton = new Button(skin, "music");
+		playPauseButton = new Button(skin, "music");
 		playPauseButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (playPauseButton.isChecked()) {
+					if (player.isEmpty())
+						playPauseButton.setChecked(false);
 					player.play();
 				} else {
-					player.pause();
+					if (player.isPlaying())
+						player.pause();
 				}
 			}
 		});
@@ -274,23 +282,14 @@ public class GdxSfxDemo implements ApplicationListener {
 		});
 		volumeSlider.setValue(player.getVolume());
 
-		final CheckBox shuffleCheckBox = new CheckBox("Shuffle", skin, "switch");
-		shuffleCheckBox.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				player.setShuffleEnabled(shuffleCheckBox.isChecked());
-			}
-		});
-		shuffleCheckBox.setChecked(player.isShuffleEnabled());
-
 		final CheckBox repeatCheckBox = new CheckBox("Repeat", skin, "switch");
 		repeatCheckBox.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				player.setRepeatEnabled(repeatCheckBox.isChecked());
+				player.setLooping(repeatCheckBox.isChecked());
 			}
 		});
-		repeatCheckBox.setChecked(player.isRepeatEnabled());
+		repeatCheckBox.setChecked(player.isLooping());
 
 		final Table fadeTable = new Table(skin);
 
@@ -301,11 +300,12 @@ public class GdxSfxDemo implements ApplicationListener {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				float value = fadeDurationSlider.getValue();
-				player.setFadeDuration(value);
+				fadein.setDuration(value);
+				fadeout.setDuration(value);
 				fadeDurationLabel.setText(String.format(format, value));
 			}
 		});
-		fadeDurationSlider.setValue(player.getFadeDuration());
+		fadeDurationSlider.setValue(2f);
 
 		final SelectBox<String> fadeInterpolationSelectBox = new SelectBox<String>(skin);
 		final ObjectMap<String, Interpolation> interpolations = new ObjectMap<String, Interpolation>();
@@ -320,7 +320,9 @@ public class GdxSfxDemo implements ApplicationListener {
 		fadeInterpolationSelectBox.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				player.setFadeInterpolation(interpolations.get(fadeInterpolationSelectBox.getSelected()));
+				Interpolation interpolation = interpolations.get(fadeInterpolationSelectBox.getSelected());
+				fadein.setInterpolation(interpolation);
+				fadeout.setInterpolation(interpolation);
 			}
 		});
 
@@ -338,37 +340,49 @@ public class GdxSfxDemo implements ApplicationListener {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				boolean fade = fadeCheckBox.isChecked();
-				player.setFadingEnabled(fade);
+				if (fade) {
+					player.addEffect(fadein);
+					player.addEffect(fadeout);
+				} else {
+					player.removeEffect(fadein);
+					player.removeEffect(fadeout);
+				}
 				fadeTable.setVisible(fade);
 			}
 		});
-		fadeCheckBox.setChecked(player.isFadingEnabled());
-		fadeTable.setVisible(player.isFadingEnabled());
+		fadeCheckBox.setChecked(true);
+		fadeTable.setVisible(true);
 
-		controlTable.defaults().padTop(4f);
-		controlTable.row().colspan(3);
-		controlTable.add(shuffleCheckBox).left();
-		controlTable.row().colspan(3);
-		controlTable.add(repeatCheckBox).left();
-		controlTable.row().colspan(3);
-		controlTable.add(fadeCheckBox).left();
-		controlTable.row().colspan(3);
-		controlTable.add(fadeTable);
-		controlTable.row();
-		controlTable.add("Pan");
-		controlTable.add(panSlider).colspan(2);
-		controlTable.row().colspan(3);
-		controlTable.add().expand();
-		controlTable.row();
-		controlTable.add(previousButton).right();
-		controlTable.add(playPauseButton);
-		controlTable.add(nextButton).left();
-		controlTable.row();
-		controlTable.add("Volume");
-		controlTable.add(volumeSlider).colspan(2);
-		controlTable.row();
-		controlTable.add("Mute");
-		controlTable.add(muteButton).colspan(2).left();
+		Table controlTable = new Table(skin);
+		
+		Table leftControlTable = new Table(skin);
+		leftControlTable.defaults().padTop(4f);
+		leftControlTable.row();
+		leftControlTable.add(fileFinder).colspan(3);
+		leftControlTable.row();
+		leftControlTable.add(previousButton).right();
+		leftControlTable.add(playPauseButton);
+		leftControlTable.add(nextButton).left();
+		leftControlTable.row();
+		leftControlTable.add("Volume").padRight(10f).left();
+		leftControlTable.add(volumeSlider);
+		leftControlTable.add(muteButton);
+		leftControlTable.row();
+		leftControlTable.add("Pan").left();
+		leftControlTable.add(panSlider).colspan(2).left();
+		
+		Table rightControlTable = new Table(skin);
+		rightControlTable.defaults().padTop(12f).left();
+		rightControlTable.row();
+		rightControlTable.add(repeatCheckBox).colspan(2);
+		rightControlTable.row();
+		rightControlTable.add(fadeCheckBox).colspan(2);
+		rightControlTable.row();
+		rightControlTable.add(fadeTable).colspan(2);
+
+		controlTable.row().growX();
+		controlTable.add(leftControlTable);
+		controlTable.add(rightControlTable);
 
 		/*********/
 		/* Debug */
@@ -386,23 +400,16 @@ public class GdxSfxDemo implements ApplicationListener {
 		/* Stage setup */
 		/***************/
 
-		Table leftTable = new Table(skin);
-		leftTable.row();
-		leftTable.add(scrollablePlaylistTable).expand().fillX().top();
-		leftTable.row();
-		leftTable.add(debugLabel).expandX().left().padLeft(30f).padTop(8f);
-
-		Table rightTable = new Table(skin);
-		rightTable.row();
-		rightTable.add(controlTable).expandY().fill();
-		rightTable.row();
-		rightTable.add(fileFinder).padTop(10f);
-
 		Table rootTable = new Table(skin);
 		rootTable.setFillParent(true);
 		rootTable.row();
-		rootTable.add(leftTable).expand().fill();
-		rootTable.add(rightTable).expandY().fill().padTop(25f).padLeft(8f);
+		rootTable.add(invitationLabel).growX().padTop(20f);
+		rootTable.row();
+		rootTable.add(scrollablePlaylistTable).expand().fillX().top();
+		rootTable.row();
+		rootTable.add(controlTable).growX();
+		rootTable.row();
+		rootTable.add(debugLabel).growX().padTop(20f).padLeft(120f).padBottom(12f);
 		
 		stage = new Stage(new ScreenViewport(camera), batch);
 		stage.addActor(rootTable);
@@ -420,10 +427,11 @@ public class GdxSfxDemo implements ApplicationListener {
 
 		float delta = Gdx.graphics.getDeltaTime();
 
-		Gdx.graphics.setTitle("gdx-sfx -- Music player demo -- " + player.currentlyPlayedTitle());
+		Gdx.graphics.setTitle("gdx-sfx -- Music player demo -- " + player.getTitle());
 
 		assetManager.update();
-		player.update(delta);
+		if (player.update(delta))
+			playPauseButton.setChecked(false);
 		stage.act(delta);
 		stage.draw();
 	}
@@ -472,9 +480,10 @@ public class GdxSfxDemo implements ApplicationListener {
 			this.music = music;
 
 			playingLabel = new Label(">", skin, "title");
-			titleLabel = new Label(music.title, skin);
+			titleLabel = new Label(music.getTitle(), skin);
 			titleLabel.setAlignment(Align.left);
-			timeProgress = new ProgressBar(0f, music.duration, 0.1f, false, skin);
+			titleLabel.setEllipsis(true);
+			timeProgress = new ProgressBar(0f, music.getDuration(), 0.1f, false, skin);
 			timeLabel = new Label("", skin);
 			timeLabel.setAlignment(Align.center);
 			volumeLevel = new Label("vol: 0%", skin);
@@ -486,9 +495,9 @@ public class GdxSfxDemo implements ApplicationListener {
 			row().pad(2f);
 			add(playingLabel);
 			add(titleLabel).expandX().fillX();
-			stack(timeProgress, timeLabel);
-			add(volumeLevel);
-			add(panLevel);
+			stack(timeProgress, timeLabel).padLeft(20f).padRight(20f);
+			add(volumeLevel).width(80f);
+			add(panLevel).width(80f);
 			add(removeButton);
 		}
 
@@ -504,7 +513,7 @@ public class GdxSfxDemo implements ApplicationListener {
 				}
 				float position = music.getPosition();
 				timeProgress.setValue(position);
-				timeLabel.setText(String.format("%.0f/%.0f", position, music.duration));
+				timeLabel.setText(String.format("%.0f/%.0f", position, music.getDuration()));
 				volumeLevel.setText(String.format("vol: %.0f%%", music.getVolume() * 100f));
 				panLevel.setText(String.format("pan: %.2f", music.getPan()));
 			} else if (wasPlaying) {

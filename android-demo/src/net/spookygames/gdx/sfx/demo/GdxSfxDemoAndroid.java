@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Spooky Games
+ * Copyright (c) 2016-2017 Spooky Games
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import android.os.Bundle;
 import net.spookygames.gdx.nativefilechooser.android.AndroidFileChooser;
 import net.spookygames.gdx.sfx.android.AndroidAudioDurationResolver;
-import net.spookygames.gdx.sfx.demo.GdxSfxDemo;
 
 public class GdxSfxDemoAndroid extends AndroidApplication {
 
@@ -42,7 +41,7 @@ public class GdxSfxDemoAndroid extends AndroidApplication {
 		config.useCompass = false;
 		config.useWakelock = true;
 
-		AndroidAudioDurationResolver.initialize(this.getPackageName());
+		AndroidAudioDurationResolver.initialize();
 
 		initialize(new GdxSfxDemo(new AndroidFileChooser(this)), config);
 	}
