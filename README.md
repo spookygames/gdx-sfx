@@ -1,6 +1,10 @@
 # gdx-sfx
 
+Some goodies for better sound effects in libgdx.
+
 Music player with playlist support and fade effects.
+
+Pitch shifting for sounds.
 
 Spatial sounds.
 
@@ -58,13 +62,13 @@ Add the pretty **bold** parts into your _build.gradle_ file:
 
 ## Asset loading
 
-This library is built upon two asset-related classes:
-* `SfxMusic` (a wrapper around libGDX's `Music` instances that implements the `Music` interface)
-* `SfxSound` (a wrapper around libGDX's `Sound` instances that implements the `Sound` interface)
+This library is built upon two asset-related interfaces:
+* `SfxMusic` (extends the `Music` interface)
+* `SfxSound` (extends the `Sound` interface)
 
 As you may guess, the library doesn't make use of pure `Music` and `Sound` instances but handles `SfxMusic` and `SfxSound` objects instead.
 
-The main difference between the Sfx- classes and their genuine counterparts is the `duration` attribute. In order for all the cool stuff to elegantly work out, the value of this field is of great importance. So let's see how to make it work as painlessly as possible.
+The main difference between the Sfx- classes and their genuine counterparts is the `getDuration()` method and the ability to apply effects to them. In order for all the cool stuff to elegantly work out, the duration is of great importance. So let's see how to make it work as painlessly as possible.
 
 ### Automatic (AssetManager)
 
@@ -97,7 +101,7 @@ You may now use the godly power of asset management to load and unload those bel
 
 Tired of creating parameter objects for every assets you create? Us too.
 
-Enters automatic audio duration resolution. This is kind of a _native_ stuff, so you'll need to initialize the magic in your platform-specific initializers.
+Enters automatic audio duration resolution. This is not cross-platform so you'll need to initialize the magic in your platform-specific initializers.
 
 Android:
 
@@ -132,21 +136,21 @@ After that, asset loading becomes way more concise.
 
 A word of warning though:
 * The `duration` property **might** not be successfully resolved, in this case the value will be the default -1, just as if no resolution had actually happened.
-* Duration resolution **will** take some time, whether it is successful or not. Not a _long_ time, but still longer than manually providing the value.
+* Duration resolution **will** take some time, whether it is successful or not. Not necessarily a _long_ time, but still longer than manually providing the value.
 
 ### Manual
 
-You're from the unmanaged side of the fence, fine. Creating instances is as easy as for anything.
+You're from the unmanaged side of the fence, fine. Creating instances is as easy as for anything. The idea is to create a SfxMusicWrapper of SfxSoundWrapper using original Music/Sound in the constructor.
 
 **Don't forget to dispose them**, of course, but you should know it by now. Disposing the Sfx- wrapper will also take care of disposing the wrapped instance.
     
     // Music
     FileHandle musicFile = Gdx.files.internal("music/cool_music.ogg");
-    SfxMusic music = new SfxMusic(Gdx.audio.newMusic(musicFile), "Cool Music #1", 12.67f);	// Duration is in seconds
+    SfxMusic music = new SfxMusicWrapper(Gdx.audio.newMusic(musicFile), "Cool Music #1", 12.67f);	// Duration is in seconds
     
     // Sound
     FileHandle soundFile = Gdx.files.internal("random_sound_effect.ogg");
-    SfxSound sound = new SfxSound(Gdx.audio.newSound(soundFile), "Random Effect!", 0.6547f);	// Seconds here too
+    SfxSound sound = new SfxSoundWrapper(Gdx.audio.newSound(soundFile), "Random Effect!", 0.6547f);	// Seconds here too
     
     ...
     
@@ -160,13 +164,100 @@ If you read section _Automatic audio duration resolution_ above, you might be cr
 
 ## Usage
 
-### Music
+### Music player
 
-TODO
+    SfxMusicPlaylist musicPlayer;
+    
+    @Override
+    public void create() {
+      ...
+      SfxMusicPlaylist musicPlayer = new SfxMusicPlaylist();
+      musicPlayer.setVolume(0.8f);
+      musicPlayer.addMusic(assetManager.get("myMusic.ogg", SfxMusic.class));
+      musicPlayer.addMusic(assetManager.get("myMusic2.ogg", SfxMusic.class));
+      musicPlayer.addEffect(Effects.fadeIn(5f));
+      musicPlayer.addEffect(Effects.fadeOut(2f));
+      musicPlayer.play();
+      ...
+    }
+    
+	@Override
+	protected void render(float delta) {
+      ...
+      musicPlayer.update(delta);
+      ...
+	}
+    
+	@Override
+	protected void pause() {
+      ...
+      musicPlayer.pause();
+      ...
+	}
+    
+	@Override
+	protected void resume() {
+      ...
+      musicPlayer.play();
+      ...
+	}
+    
+	@Override
+	protected void dispose() {
+      ...
+      assetManager.dispose();
+      // Nothing to specifically dispose here, resources are handled by AssetManager
+      ...
+	}
 
-### Sound
+### Pitch-shifting sounds, via AssetManager
 
-TODO
+    assetManager.setLoader(SfxSound.class, new SfxSoundLoader(resolver));
+    
+    SoundParameters parameter = new SoundParameters();
+    parameter.pitchRange = 0.2f;
+    
+    assetManager.load("MySound.wav", SfxSound.class, parameter);
+
+That's about it.
+
+### Spatial sounds (2D example)
+
+    Spatializer<Vector2> spatializer;
+    SpatializedSoundPlayer<Vector2> spatializedPlayer;
+    
+    float minZoom = 0.5f;
+    float maxZoom = 2f;
+    
+    Camera camera;
+    
+    @Override
+    public void create() {
+      ...
+      	this.spatializer = new SomeSoundSpatializer2();	// This one is just an example
+		this.spatializer.setVerticalRange(2f);
+		this.spatializer.setHorizontalRange(6f);
+		
+		this.spatializedPlayer = new SpatializedSoundPlayer<Vector2>();
+		this.spatializedPlayer.setSpatializer(spatializer);
+		this.spatializedPlayer.setVolume(0.7f);
+      ...
+    }
+    
+	@Override
+	protected void render(float delta) {
+      ...
+      Vector3 position = camera.position;
+      Vector2 position = camera.getPosition();
+      float relativeZoom = (camera.zoom - minZoom) / (maxZoom - minZoom);
+		spatializer.setCenter(position.x, position.y, relativeZoom);
+		spatializedPlayer.update(delta);
+      ...
+	}
+    
+    public void play(Vector2 position, SfxSound sound) {
+      spatializedPlayer.play(position, sound);
+    }
 
 ## Demo
 
@@ -178,16 +269,6 @@ A demo for the `SfxMusicPlayer` is available under the _Releases_ tab and you ar
 - [x] Android
 - [ ] iOS
 - [ ] HTML
-
-> - can i haz moar os suport?
-
-> - We'd be glad to receive your Pull Requests ;-)
-
-## Roadmap
-
-* Fill the Usage section of this README
-* Javadoc
-* Re-architecture, 'cause we should have been at least _that_ smart from the beginning
 
 ## Credits
 
