@@ -57,8 +57,20 @@ public class SfxMusicPlaylist implements SfxMusic {
 		return content;
 	}
 
+	public boolean isEmpty() {
+		return content.size == 0;
+	}
+
+	public int size() {
+		return content.size;
+	}
+
 	public void addMusic(SfxMusic music) {
 		content.add(music);
+	}
+
+	public void containsMusic(SfxMusic music) {
+		content.contains(music, true);
 	}
 
 	public boolean removeMusic(SfxMusic music) {
@@ -142,11 +154,13 @@ public class SfxMusicPlaylist implements SfxMusic {
 
 		// Start music
 		if (pause) {
-			// Remove marker
+			// We were paused, remove marker and resume current
 			pause = false;
-			tryPlay(getCurrentlyPlayed()); // We were paused
+			if (current != null)
+				current.play();
 		} else {
-			next(); // We were stopped
+			// We were stopped, start playing
+			next();
 		}
 	}
 
@@ -176,16 +190,14 @@ public class SfxMusicPlaylist implements SfxMusic {
 	public void stop() {
 		if (!play)
 			return; // Already stopped
-		
+
 		stopPending = true;
 
-		if (index >= 0) {
-			// Stop current music
-			current.stop();
+		// Stop current music
+		current.stop();
 
-			// Reset index
-			resetIndex();
-		}
+		// Reset index
+		resetIndex();
 	}
 
 	@Override
@@ -321,6 +333,7 @@ public class SfxMusicPlaylist implements SfxMusic {
 	private void tryPlay(SfxMusic music) {
 		if (current != null) {
 			removeEffectsFromMusic(current);
+			current.stop();
 		}
 		addEffectsToMusic(music);
 		music.setPan(pan, volume);
@@ -360,7 +373,7 @@ public class SfxMusicPlaylist implements SfxMusic {
 
 	private SfxMusic nextMusic() {
 		index++;
-		if (index == content.size) {
+		if (index >= content.size) {
 			resetIndex();
 			if (repeat) {
 				return nextMusic();
