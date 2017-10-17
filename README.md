@@ -27,6 +27,12 @@ Add the pretty **bold** parts into your _build.gradle_ file:
     
     ...
     
+    allprojects {
+        ext {
+            <b>gdxsfxVersion = '2.0.1'</b>
+        }
+    }
+    
     project(":desktop") {
         
         ...
@@ -34,7 +40,7 @@ Add the pretty **bold** parts into your _build.gradle_ file:
         dependencies {
             compile project(":core")
             ...
-            <b>compile "net.spookygames.gdx:gdx-sfx-desktop:2.0.0"</b>
+            <b>compile "net.spookygames.gdx:gdx-sfx-desktop:$gdxsfxVersion"</b>
         }
     }
     
@@ -45,7 +51,7 @@ Add the pretty **bold** parts into your _build.gradle_ file:
         dependencies {
             compile project(":core")
             ...
-            <b>compile "net.spookygames.gdx:gdx-sfx-android:2.0.0"</b>
+            <b>compile "net.spookygames.gdx:gdx-sfx-android:$gdxsfxVersion"</b>
         }
     }
     
@@ -55,7 +61,7 @@ Add the pretty **bold** parts into your _build.gradle_ file:
         
         dependencies {
             ...
-            <b>compile "net.spookygames.gdx:gdx-sfx:2.0.0"</b>
+            <b>compile "net.spookygames.gdx:gdx-sfx:$gdxsfxVersion"</b>
         }
     }
 </pre>
