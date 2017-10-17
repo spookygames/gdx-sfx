@@ -194,7 +194,8 @@ public class SfxMusicPlaylist implements SfxMusic {
 		stopPending = true;
 
 		// Stop current music
-		current.stop();
+		if (current != null)
+			current.stop();
 
 		// Reset index
 		resetIndex();
@@ -287,7 +288,7 @@ public class SfxMusicPlaylist implements SfxMusic {
 	@Override
 	public boolean update(float deltaTime) {
 		if (play) {
-			if (current.update(deltaTime)) {
+			if (current == null || current.update(deltaTime)) {
 				if (stopPending) {
 					// Stop effectively
 					play = false;
