@@ -23,22 +23,16 @@
  */
 package net.spookygames.gdx.sfx.spatial;
 
-import com.badlogic.gdx.audio.Sound;
-
 public interface Spatializer<T> {
 
 	/**
 	 * Apply spatialization to a given sound instance
 	 * 
-	 * @param id
-	 *            the id of the sound instance
-	 * @param position
-	 *            the position of this sound in space
-	 * @param sound
-	 *            the sound to apply spatialization to
+	 * @param instance
+	 *            the instance to apply spatialization to
 	 * @param nominalVolume
 	 *            the volume this sound would be at without spatialization
 	 */
-	void spatialize(long id, T position, Sound sound, float nominalVolume);
+	void spatialize(SpatializedSound<T> instance, float nominalVolume);
 
 }

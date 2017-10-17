@@ -32,9 +32,6 @@ public class SfxSoundWrapper implements SfxSound {
 	private final String title;
 	private final float duration; // In seconds
 
-	// Copy of some stuff as we have no direct access to them
-	private float pan = 0f;
-
 	public SfxSoundWrapper(Sound wrappedSound, String title, float duration) {
 		this.wrapped = wrappedSound;
 		this.title = title;
@@ -131,15 +128,9 @@ public class SfxSoundWrapper implements SfxSound {
 		wrapped.setVolume(soundId, volume);
 	}
 
-	@Override
-	public float getPan() {
-		return this.pan;
-	}
-
 	/** Just so you know: Panning only works with Mono samples! Now you know. */
 	@Override
 	public void setPan(long soundId, float pan, float volume) {
-		this.pan = pan;
 		wrapped.setPan(soundId, pan, volume);
 	}
 

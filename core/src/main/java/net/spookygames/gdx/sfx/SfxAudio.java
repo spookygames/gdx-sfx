@@ -39,12 +39,4 @@ public interface SfxAudio {
 	 * @return the duration of this SfxAudio instance
 	 */
 	float getDuration();
-
-	/**
-	 * Get the panning of this SfxAudio instance. Added here as there is no
-	 * unified way to get panning between gdx's Sound and Music.
-	 * 
-	 * @return the panning of this SfxAudio instance
-	 */
-	float getPan();
 }

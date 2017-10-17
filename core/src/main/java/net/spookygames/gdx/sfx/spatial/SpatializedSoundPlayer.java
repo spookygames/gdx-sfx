@@ -27,7 +27,6 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.LongMap;
-import com.badlogic.gdx.utils.LongMap.Entry;
 import com.badlogic.gdx.utils.Pool;
 
 import net.spookygames.gdx.sfx.SfxSound;
@@ -82,7 +81,7 @@ public class SpatializedSoundPlayer<T> {
 			Gdx.app.error("gdx-sfx", "Couldn't play sound " + sound);
 		} else {
 			instance.setLooping(looping);
-			spatializer.spatialize(id, position, sound, this.volume);
+			spatializer.spatialize(instance, this.volume);
 
 			sounds.put(id, instance);
 		}
@@ -93,16 +92,15 @@ public class SpatializedSoundPlayer<T> {
 	public void update(float delta) {
 		Spatializer<T> spatializer = this.spatializer;
 		
-		Iterator<Entry<SpatializedSound<T>>> iterator = sounds.iterator();
+		Iterator<SpatializedSound<T>> iterator = sounds.values();
 		while (iterator.hasNext()) {
-			Entry<SpatializedSound<T>> entry = iterator.next();
-			SpatializedSound<T> instance = entry.value;
+			SpatializedSound<T> instance = iterator.next();
 
 			if (instance.update(delta)) {
 				iterator.remove();
 				pool.free(instance);
 			} else {
-				spatializer.spatialize(entry.key, instance.position, instance.sound, this.volume);
+				spatializer.spatialize(instance, this.volume);
 			}
 		}
 	}

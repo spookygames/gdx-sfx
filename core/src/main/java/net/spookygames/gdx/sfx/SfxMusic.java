@@ -26,4 +26,13 @@ package net.spookygames.gdx.sfx;
 import com.badlogic.gdx.audio.Music;
 
 public interface SfxMusic extends Music, SfxAudio, SfxEffectsContainer, Updateable {
+
+	/**
+	 * Get the panning of this SfxMusic instance. Added here as there is no way
+	 * to get panning from gdx's Music.
+	 * 
+	 * @return the panning of this SfxMusic instance
+	 */
+	float getPan();
+
 }

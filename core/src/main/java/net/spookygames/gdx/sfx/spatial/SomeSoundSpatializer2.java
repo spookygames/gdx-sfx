@@ -23,7 +23,6 @@
  */
 package net.spookygames.gdx.sfx.spatial;
 
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -71,7 +70,8 @@ public class SomeSoundSpatializer2 implements Spatializer<Vector2> {
 	}
 
 	@Override
-	public void spatialize(long id, Vector2 position, Sound sound, float nominalVolume) {
+	public void spatialize(SpatializedSound<Vector2> instance, float nominalVolume) {
+		Vector2 position = instance.getPosition();
 		float x = position.x;
 		float y = position.y;
 
@@ -95,7 +95,7 @@ public class SomeSoundSpatializer2 implements Spatializer<Vector2> {
 
 		// Result
 		float volume = nominalVolume * hRatio * vRatio;
-		sound.setPan(id, MathUtils.clamp(panning, -1f, 1f), MathUtils.clamp(volume, 0f, 1f));
+		instance.setPan(MathUtils.clamp(panning, -1f, 1f), MathUtils.clamp(volume, 0f, 1f));
 	}
 
 }

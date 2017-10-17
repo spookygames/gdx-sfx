@@ -28,11 +28,14 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 
 public class SpatializedSound<T> implements Poolable {
 
-	Sound sound;
-	long id;
-	float duration;
-	T position;
-	
+	private Sound sound;
+	private long id;
+	private float duration;
+	private T position;
+	private float volume;
+	private float pitch;
+	private float pan;
+
 	private float elapsed;
 
 	private boolean running = false;
@@ -43,13 +46,19 @@ public class SpatializedSound<T> implements Poolable {
 		if (sound != null)
 			sound.stop(id);
 		sound = null;
-		
+
 		id = -1L;
-		
+
 		duration = -1f;
 
+		position = null;
+
+		volume = 1f;
+		pitch = 1f;
+		pan = 0f;
+
 		elapsed = Float.MAX_VALUE;
-		
+
 		running = false;
 		looping = false;
 	}
@@ -57,25 +66,91 @@ public class SpatializedSound<T> implements Poolable {
 	public long initialize(Sound sound, float duration, T position, float volume, float pitch, float panning) {
 		this.sound = sound;
 		this.duration = duration;
-		
+
 		this.position = position;
-		
+
 		this.elapsed = 0f;
 
 		running = true;
 
-		return this.id = sound.play(volume, pitch, panning); 
+		return this.id = sound.play(this.volume = volume, this.pitch = pitch, this.pan = panning);
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public Sound getSound() {
+		return sound;
+	}
+
+	public float getDuration() {
+		return this.duration;
+	}
+
+	public T getPosition() {
+		return position;
+	}
+
+	public void setPosition(T position) {
+		this.position = position;
 	}
 	
+	public float getPitch() {
+		return this.pitch;
+	}
+
+	public void setPitch(float pitch) {
+		if (this.pitch != pitch) {
+			this.pitch = pitch;
+			sound.setPitch(id, pitch);	
+		}
+	}
+	
+	public float getVolume() {
+		return this.volume;
+	}
+
+	public void setVolume(float volume) {
+		if (this.volume != volume) {
+			this.volume = volume;
+			sound.setVolume(id, volume);
+		}
+	}
+	
+	public float getPan() {
+		return this.pan;
+	}
+
+	public void setPan(float pan, float volume) {
+		if (this.pan != pan || this.volume != volume) {
+			this.pan = pan;
+			this.volume = volume;
+			sound.setPan(id, pan, volume);
+		}
+	}
+
+	public boolean isLooping() {
+		return looping;
+	}
+
+	public void setLooping(boolean looping) {
+		if (this.looping != looping) {
+			this.looping = looping;
+			sound.setLooping(id, looping);	
+		}
+	}
+
 	public boolean update(float deltaTime) {
-		if(running) {
+		if (running) {
 			elapsed += deltaTime;
 		}
-		if(elapsed >= duration) {
+
+		if (elapsed >= duration) {
 
 			elapsed -= duration;
 
-			if(looping) {
+			if (looping) {
 				return false;
 			} else {
 				running = false;
@@ -84,15 +159,6 @@ public class SpatializedSound<T> implements Poolable {
 		}
 
 		return false;
-	}
-
-	public boolean isLooping() {
-		return looping;
-	}
-
-	public void setLooping(boolean looping) {
-		this.looping = looping;
-		sound.setLooping(id, looping);
 	}
 
 	public void stop() {
