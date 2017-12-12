@@ -14,7 +14,7 @@ allprojects {
     apply plugin: 'eclipse'
 
     group = 'net.spookygames.gdx'
-    version = '2.1.0'
+    version = '2.1.1'
 
     ext {
         gdxVersion = '1.8.0'
