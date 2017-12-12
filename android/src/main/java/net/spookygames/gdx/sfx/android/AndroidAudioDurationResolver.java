@@ -59,7 +59,7 @@ public class AndroidAudioDurationResolver implements MusicDurationResolver, Soun
 		if (Build.VERSION.SDK_INT >= 10) {
 			try {
 				return sdk10Duration(soundFile);
-			} catch (IOException ex) {
+			} catch (Exception ex) {
 				Gdx.app.error("gdx-sfx", "Unable to resolve duration of sound file " + soundFile.toString(), ex);
 			}
 		}
