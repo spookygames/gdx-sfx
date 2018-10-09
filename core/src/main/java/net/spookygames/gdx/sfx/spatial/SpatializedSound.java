@@ -170,7 +170,7 @@ public class SpatializedSound<T> implements Poolable {
     }
 
     public boolean update(float deltaTime) {
-        if (!running) {
+        if (sound == null) {
             return true;
         }
 
@@ -187,8 +187,7 @@ public class SpatializedSound<T> implements Poolable {
 
             if (fadeProgress >= fadeTime) {
                 fadeProgress = -1;
-                setVolume(fadeIn ? realVolume : 0);
-
+                
                 if (!fadeIn) {
                     if (stop) {
                         reset();
