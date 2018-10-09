@@ -187,6 +187,7 @@ public class SpatializedSound<T> implements Poolable {
 
             if (fadeProgress >= fadeTime) {
                 fadeProgress = -1;
+                setVolume(fadeIn ? realVolume : 0);
                 
                 if (!fadeIn) {
                     if (stop) {
