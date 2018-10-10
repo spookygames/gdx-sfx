@@ -80,6 +80,7 @@ public class SpatializedSoundPlayer<T> {
 			pool.free(instance);
 			Gdx.app.error("gdx-sfx", "Couldn't play sound " + sound);
 		} else {
+			instance.setLooping(true);
 			spatializer.spatialize(instance, this.volume);
 
 			sounds.put(id, instance);
