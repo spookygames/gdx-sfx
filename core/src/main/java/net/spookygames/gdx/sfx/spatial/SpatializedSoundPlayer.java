@@ -74,13 +74,12 @@ public class SpatializedSoundPlayer<T> {
 		
 		Spatializer<T> spatializer = this.spatializer;
 		
-		long id = instance.initialize(sound, duration, position, 0f, pitch, 0f);
+		long id = instance.initialize(sound, looping, duration, position, 0f, pitch, 0f);
 
 		if (id == -1) {
 			pool.free(instance);
 			Gdx.app.error("gdx-sfx", "Couldn't play sound " + sound);
 		} else {
-			instance.setLooping(looping);
 			spatializer.spatialize(instance, this.volume);
 
 			sounds.put(id, instance);
