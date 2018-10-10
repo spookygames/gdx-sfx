@@ -19,12 +19,12 @@ public class FadingSpatializedSound<T> extends SpatializedSound<T> {
 		fadeIn = false;
 		realVolume = 0;
 	}
-	
-	public long initialize(Sound sound, float duration, T position,	float volume, float pitch, float panning, float fadeTime, boolean fadeIn) {
+
+	public long initialize(Sound sound, float duration, T position, float volume, float pitch, float panning, float fadeTime, boolean fadeIn) {
 		long id = super.initialize(sound, duration, position, volume, pitch, panning);
-		
+
 		this.fadeTime = fadeTime;
-		
+
 		if (fadeIn) {
 			fadeIn();
 		}
@@ -35,7 +35,7 @@ public class FadingSpatializedSound<T> extends SpatializedSound<T> {
 	public boolean isFading() {
 		return fadeProgress > -1;
 	}
-	
+
 	public void setVolume(float volume) {
 		// setup correct target volume we got from spatialize
 		if (elapsed == 0 && fadeProgress > -1) {
@@ -60,7 +60,7 @@ public class FadingSpatializedSound<T> extends SpatializedSound<T> {
 		if (getSound() == null) {
 			return true;
 		}
-		
+
 		if (fadeTime > 0 && fadeProgress > -1) {
 			float progress = fadeProgress / fadeTime;
 			if (!fadeIn)
@@ -83,10 +83,8 @@ public class FadingSpatializedSound<T> extends SpatializedSound<T> {
 			}
 		}
 
-		
 		return super.update(deltaTime);
 	}
-	
 
 	public void stop() {
 		if (fadeTime > 0) {
