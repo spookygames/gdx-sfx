@@ -35,18 +35,11 @@ public class SpatializedSound<T> implements Poolable {
 	private float volume;
 	private float pitch;
 	private float pan;
-	private float fadeTime;
 
-	private float elapsed;
+	protected float elapsed;
 
 	private boolean running = false;
 	private boolean looping = false;
-
-	private float fadeProgress = -1;
-	private boolean fadeIn;
-	private float realVolume;
-
-	private boolean stop = false;
 
 	@Override
 	public void reset() {
@@ -60,20 +53,17 @@ public class SpatializedSound<T> implements Poolable {
 
 		position = null;
 
-		fadeTime = 0;
-		fadeProgress = -1;
 		volume = 1f;
 		pitch = 1f;
 		pan = 0f;
 
 		elapsed = Float.MAX_VALUE;
 
-		stop = false;
 		running = false;
 		looping = false;
 	}
 
-	public long initialize(Sound sound, float duration, T position, float volume, float pitch, float panning, float fadeTime, boolean fadeIn) {
+	public long initialize(Sound sound, float duration, T position,	float volume, float pitch, float panning) {
 		this.sound = sound;
 		this.duration = duration;
 
@@ -82,14 +72,8 @@ public class SpatializedSound<T> implements Poolable {
 		this.elapsed = 0f;
 
 		running = true;
-		this.fadeTime = fadeTime;
 		this.volume = volume;
-		this.id = sound.play(fadeIn ? 0 : volume, this.pitch = pitch, this.pan = panning);
-		if (fadeIn) {
-			fadeIn();
-		}
-
-		return this.id;
+		return this.id = sound.play(volume, this.pitch = pitch,	this.pan = panning);
 	}
 
 	public long getId() {
@@ -128,10 +112,7 @@ public class SpatializedSound<T> implements Poolable {
 	}
 
 	public void setVolume(float volume) {
-		// setup correct target volume we got from spatialize
-		if (elapsed == 0 && fadeProgress > -1) {
-			realVolume = volume;
-		} else if (this.volume != volume) {
+		if (this.volume != volume) {
 			this.volume = volume;
 			sound.setVolume(id, volume);
 		}
@@ -142,12 +123,7 @@ public class SpatializedSound<T> implements Poolable {
 	}
 
 	public void setPan(float pan, float volume) {
-		// setup correct target volume we got from spatialize
-		if (elapsed == 0 && fadeProgress > -1) {
-			realVolume = volume;
-			this.pan = pan;
-			sound.setPan(id, pan, 0);
-		} else if (this.pan != pan || this.volume != volume) {
+		if (this.pan != pan || this.volume != volume) {
 			this.pan = pan;
 			this.volume = volume;
 			sound.setPan(id, pan, volume);
@@ -165,40 +141,9 @@ public class SpatializedSound<T> implements Poolable {
 		}
 	}
 
-	public boolean isFading() {
-		return fadeProgress > -1;
-	}
-
 	public boolean update(float deltaTime) {
-		if (sound == null) {
-			return true;
-		}
-
 		if (running) {
 			elapsed += deltaTime;
-		}
-
-		if (fadeTime > 0 && fadeProgress > -1) {
-			float progress = fadeProgress / fadeTime;
-			if (!fadeIn)
-				progress = 1 - progress;
-			setVolume(progress * realVolume);
-
-			fadeProgress += deltaTime;
-
-			if (fadeProgress >= fadeTime) {
-				fadeProgress = -1;
-				setVolume(fadeIn ? realVolume : 0);
-
-				if (!fadeIn) {
-					if (stop) {
-						reset();
-					} else {
-						sound.pause(id);
-						running = false;
-					}
-				}
-			}
 		}
 
 		if (elapsed >= duration) {
@@ -216,41 +161,16 @@ public class SpatializedSound<T> implements Poolable {
 	}
 
 	public void stop() {
-		if (fadeTime > 0) {
-			stop = true;
-			fadeOut();
-		} else {
-			reset();
-		}
+		reset();
 	}
 
 	public void resume() {
 		sound.resume(id);
 		running = true;
-		if (fadeTime > 0) {
-			fadeIn();
-		}
 	}
 
 	public void pause() {
-		if (fadeTime > 0) {
-			fadeOut();
-		} else {
-			sound.pause(id);
-			running = false;
-		}
-	}
-
-	public void fadeIn() {
-		realVolume = volume;
-		setVolume(0);
-		fadeIn = true;
-		fadeProgress = 0;
-	}
-
-	public void fadeOut() {
-		realVolume = volume;
-		fadeIn = false;
-		fadeProgress = 0;
+		sound.pause(id);
+		running = false;
 	}
 }

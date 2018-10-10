@@ -33,20 +33,18 @@ import net.spookygames.gdx.sfx.SfxSound;
 
 public class SpatializedSoundPlayer<T> {
 
-	private final Pool<SpatializedSound<T>> pool = new Pool<SpatializedSound<T>>() {
+	protected final Pool<SpatializedSound<T>> pool = new Pool<SpatializedSound<T>>() {
 		@Override
 		protected SpatializedSound<T> newObject() {
-			return new SpatializedSound<T>();
+			return SpatializedSoundPlayer.this.newObject();
 		};
 	};
 
-	private final LongMap<SpatializedSound<T>> sounds = new LongMap<SpatializedSound<T>>();
+	protected final LongMap<SpatializedSound<T>> sounds = new LongMap<SpatializedSound<T>>();
 
-	private Spatializer<T> spatializer;
+	protected Spatializer<T> spatializer;
 
-	private float volume = 1f;
-
-	private float fadeTime = 0f;
+	protected float volume = 1f;
 
 	public Spatializer<T> getSpatializer() {
 		return spatializer;
@@ -64,30 +62,18 @@ public class SpatializedSoundPlayer<T> {
 		this.volume = volume;
 	}
 
-	public void setFadeTime(float fadeTime) {
-		this.fadeTime = fadeTime;
-	}
-
-	public float getFadeTime() {
-		return fadeTime;
-	}
-
 	public long play(T position, SfxSound sound) {
 		return play(position, sound, 1f, false);
 	}
 
 	public long play(T position, SfxSound sound, float pitch, boolean looping) {
-		return play(position, sound, pitch, looping, false);
-	}
-
-	public long play(T position, SfxSound sound, float pitch, boolean looping, boolean fadeIn) {
 		SpatializedSound<T> instance = pool.obtain();
 
 		float duration = sound.getDuration();
 
 		Spatializer<T> spatializer = this.spatializer;
 
-		long id = instance.initialize(sound, duration, position, 0f, pitch, 0f,	fadeTime, fadeIn);
+		long id = instance.initialize(sound, duration, position, 0f, pitch, 0f);
 
 		if (id == -1) {
 			pool.free(instance);
@@ -112,7 +98,7 @@ public class SpatializedSoundPlayer<T> {
 			if (instance.update(delta)) {
 				iterator.remove();
 				pool.free(instance);
-			} else if (!instance.isFading()) {
+			} else {
 				spatializer.spatialize(instance, this.volume);
 			}
 		}
@@ -131,6 +117,7 @@ public class SpatializedSoundPlayer<T> {
 
 		if (sound != null) {
 			sound.stop();
+			pool.free(sound);
 		}
 	}
 
@@ -148,5 +135,9 @@ public class SpatializedSoundPlayer<T> {
 		if (sound != null) {
 			sound.resume();
 		}
+	}
+
+	protected SpatializedSound<T> newObject() {
+		return new SpatializedSound<T>();
 	}
 }
