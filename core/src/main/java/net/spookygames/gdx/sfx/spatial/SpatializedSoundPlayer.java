@@ -32,7 +32,7 @@ import com.badlogic.gdx.utils.Pool;
 import net.spookygames.gdx.sfx.SfxSound;
 
 public class SpatializedSoundPlayer<T> {
-	
+
 	private final Pool<SpatializedSound<T>> pool = new Pool<SpatializedSound<T>>() {
 		@Override
 		protected SpatializedSound<T> newObject() {
@@ -41,7 +41,7 @@ public class SpatializedSoundPlayer<T> {
 	};
 
 	private final LongMap<SpatializedSound<T>> sounds = new LongMap<SpatializedSound<T>>();
-	
+
 	private Spatializer<T> spatializer;
 
 	private float volume = 1f;
@@ -69,29 +69,30 @@ public class SpatializedSoundPlayer<T> {
 	public long play(T position, SfxSound sound, float pitch, boolean looping) {
 
 		SpatializedSound<T> instance = pool.obtain();
-		
+
 		float duration = sound.getDuration();
-		
+
 		Spatializer<T> spatializer = this.spatializer;
-		
-		long id = instance.initialize(sound, looping, duration, position, 0f, pitch, 0f);
+
+		long id = instance.initialize(sound, looping, duration, position, 0f,
+				pitch, 0f);
 
 		if (id == -1) {
 			pool.free(instance);
 			Gdx.app.error("gdx-sfx", "Couldn't play sound " + sound);
 		} else {
-			instance.setLooping(true);
+			instance.setLooping(looping);
 			spatializer.spatialize(instance, this.volume);
 
 			sounds.put(id, instance);
 		}
-		
+
 		return id;
 	}
 
 	public void update(float delta) {
 		Spatializer<T> spatializer = this.spatializer;
-		
+
 		Iterator<SpatializedSound<T>> iterator = sounds.values();
 		while (iterator.hasNext()) {
 			SpatializedSound<T> instance = iterator.next();
