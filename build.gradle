@@ -3,15 +3,17 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath 'com.android.tools.build:gradle:3.2.1'
     }
 }
 
 allprojects {
 
     apply plugin: 'eclipse'
+    apply plugin: 'idea'
 
     group = 'net.spookygames.gdx'
     version = '2.1.1'
@@ -23,6 +25,8 @@ allprojects {
 
     repositories {
         mavenCentral()
+        jcenter()
+        google()
         maven { url "http://dl.bintray.com/spookygames/oss" }
     }
 }

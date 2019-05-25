@@ -3,40 +3,41 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath 'com.android.tools.build:gradle:3.2.1'
     }
 }
 
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 configurations { natives }
 
 dependencies {
-    compile project(':core')
-    compile project(path: ':core', configuration: 'demo')
-    compile project(':android')
-    compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+    implementation project(':core')
+    implementation project(path: ':core', configuration: 'demo')
+    implementation project(':android')
+    implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
-    compile("net.spookygames.gdx:gdx-nativefilechooser-android:1.0.0")
+    implementation 'net.spookygames.gdx:gdx-nativefilechooser-android:1.0.0'
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '25'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "net.spookygames.gdx.sfx"
-        minSdkVersion 8
-        targetSdkVersion 23
+        minSdkVersion 14
+        targetSdkVersion 28
     }
     
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
+        sourceCompatibility = 1.6
+        targetCompatibility = 1.6
     }
     
     sourceSets {
@@ -49,8 +50,6 @@ android {
             assets.srcDirs = ['assets']
             jniLibs.srcDirs = ['libs']
         }
-
-        instrumentTest.setRoot('tests')
     }
 }
 
@@ -61,9 +60,9 @@ targetCompatibility = 1.6
 // the natives configuration, and extracts them to the proper libs/ folders
 // so they get packed with the APK.
 task copyAndroidNatives() { 
-    file("libs/armeabi/").mkdirs();
-    file("libs/armeabi-v7a/").mkdirs();
-    file("libs/x86/").mkdirs();
+    file("libs/armeabi/").mkdirs()
+    file("libs/armeabi-v7a/").mkdirs()
+    file("libs/x86/").mkdirs()
 
     configurations.natives.files.each { jar ->
         def outputDir = null
@@ -129,7 +128,7 @@ eclipse {
 
     project {
         natures 'org.eclipse.andmore.AndroidNature'
-        buildCommands.clear();
+        buildCommands.clear()
         buildCommand "org.eclipse.andmore.ResourceManagerBuilder"
         buildCommand "org.eclipse.andmore.PreCompilerBuilder"
         buildCommand "org.eclipse.jdt.core.javabuilder"
