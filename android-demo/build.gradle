@@ -15,8 +15,7 @@ apply plugin: 'com.android.application'
 configurations { natives }
 
 dependencies {
-    implementation project(':core')
-    implementation project(path: ':core', configuration: 'demo')
+    implementation project(':core-demo')
     implementation project(':android')
     implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
