@@ -32,19 +32,19 @@ import com.badlogic.gdx.utils.Pool;
 import net.spookygames.gdx.sfx.SfxSound;
 
 public class SpatializedSoundPlayer<T> {
-	
-	private final Pool<SpatializedSound<T>> pool = new Pool<SpatializedSound<T>>() {
+
+	protected final Pool<SpatializedSound<T>> pool = new Pool<SpatializedSound<T>>() {
 		@Override
 		protected SpatializedSound<T> newObject() {
-			return new SpatializedSound<T>();
+			return SpatializedSoundPlayer.this.newObject();
 		};
 	};
 
-	private final LongMap<SpatializedSound<T>> sounds = new LongMap<SpatializedSound<T>>();
-	
-	private Spatializer<T> spatializer;
+	protected final LongMap<SpatializedSound<T>> sounds = new LongMap<SpatializedSound<T>>();
 
-	private float volume = 1f;
+	protected Spatializer<T> spatializer;
+
+	protected float volume = 1f;
 
 	public Spatializer<T> getSpatializer() {
 		return spatializer;
@@ -67,13 +67,12 @@ public class SpatializedSoundPlayer<T> {
 	}
 
 	public long play(T position, SfxSound sound, float pitch, boolean looping) {
-
 		SpatializedSound<T> instance = pool.obtain();
-		
+
 		float duration = sound.getDuration();
-		
+
 		Spatializer<T> spatializer = this.spatializer;
-		
+
 		long id = instance.initialize(sound, duration, position, 0f, pitch, 0f);
 
 		if (id == -1) {
@@ -85,13 +84,13 @@ public class SpatializedSoundPlayer<T> {
 
 			sounds.put(id, instance);
 		}
-		
+
 		return id;
 	}
 
 	public void update(float delta) {
 		Spatializer<T> spatializer = this.spatializer;
-		
+
 		Iterator<SpatializedSound<T>> iterator = sounds.values();
 		while (iterator.hasNext()) {
 			SpatializedSound<T> instance = iterator.next();
@@ -114,11 +113,31 @@ public class SpatializedSoundPlayer<T> {
 	}
 
 	public void stop(long id) {
-		SpatializedSound<T> sound = sounds.remove(id);
+		SpatializedSound<T> sound = sounds.get(id);
 
 		if (sound != null) {
 			sound.stop();
 			pool.free(sound);
 		}
+	}
+
+	public void pause(long id) {
+		SpatializedSound<T> sound = sounds.get(id);
+
+		if (sound != null) {
+			sound.pause();
+		}
+	}
+
+	public void resume(long id) {
+		SpatializedSound<T> sound = sounds.get(id);
+
+		if (sound != null) {
+			sound.resume();
+		}
+	}
+
+	protected SpatializedSound<T> newObject() {
+		return new SpatializedSound<T>();
 	}
 }

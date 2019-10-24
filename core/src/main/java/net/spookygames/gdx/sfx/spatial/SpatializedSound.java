@@ -36,7 +36,7 @@ public class SpatializedSound<T> implements Poolable {
 	private float pitch;
 	private float pan;
 
-	private float elapsed;
+	protected float elapsed;
 
 	private boolean running = false;
 	private boolean looping = false;
@@ -72,7 +72,6 @@ public class SpatializedSound<T> implements Poolable {
 		this.elapsed = 0f;
 
 		running = true;
-
 		return this.id = sound.play(this.volume = volume, this.pitch = pitch, this.pan = panning);
 	}
 
@@ -95,7 +94,7 @@ public class SpatializedSound<T> implements Poolable {
 	public void setPosition(T position) {
 		this.position = position;
 	}
-	
+
 	public float getPitch() {
 		return this.pitch;
 	}
@@ -103,10 +102,10 @@ public class SpatializedSound<T> implements Poolable {
 	public void setPitch(float pitch) {
 		if (this.pitch != pitch) {
 			this.pitch = pitch;
-			sound.setPitch(id, pitch);	
+			sound.setPitch(id, pitch);
 		}
 	}
-	
+
 	public float getVolume() {
 		return this.volume;
 	}
@@ -117,7 +116,7 @@ public class SpatializedSound<T> implements Poolable {
 			sound.setVolume(id, volume);
 		}
 	}
-	
+
 	public float getPan() {
 		return this.pan;
 	}
@@ -137,7 +136,7 @@ public class SpatializedSound<T> implements Poolable {
 	public void setLooping(boolean looping) {
 		if (this.looping != looping) {
 			this.looping = looping;
-			sound.setLooping(id, looping);	
+			sound.setLooping(id, looping);
 		}
 	}
 
@@ -147,7 +146,6 @@ public class SpatializedSound<T> implements Poolable {
 		}
 
 		if (elapsed >= duration) {
-
 			elapsed -= duration;
 
 			if (looping) {
