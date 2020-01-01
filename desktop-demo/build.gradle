@@ -1,0 +1,27 @@
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+dependencies {
+    compile project(':core-demo')
+    compile project(':desktop')
+    compile "net.spookygames.gdx:gdx-nativefilechooser-desktop:1.0.0"
+}
+
+archivesBaseName = "$libName-${project.name}"
+
+jar {
+    from files(sourceSets.main.output.classesDir)
+    from {configurations.compile.collect {zipTree(it)}}
+
+    manifest {
+        attributes 'Main-Class': "net.spookygames.gdx.sfx.demo.GdxSfxDemoDesktop"
+    }
+}
+
+apply from: '../license.gradle'
+license.includes(["**/*.java"])

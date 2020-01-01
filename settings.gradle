@@ -1,2 +1,2 @@
-include 'core', 'android', 'desktop', 'android-demo'
+include 'core', 'android', 'desktop', 'core-demo', 'android-demo', 'desktop-demo'
 

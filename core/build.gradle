@@ -8,25 +8,11 @@ targetCompatibility = 1.6
 
 dependencies {
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-    testCompile "net.spookygames.gdx:gdx-nativefilechooser:1.0.0"
 }
 
 apply plugin: 'maven-publish'
 
 archivesBaseName = "$libName"
-
-configurations {
-    demo.extendsFrom testRuntime
-}
-
-task demoJar(type: Jar) {
-    classifier 'demo'
-    from sourceSets.test.output
-}
-
-artifacts {
-    demo demoJar
-}
 
 // Javadoc
 task javadocJar (type: Jar, dependsOn: javadoc) {
