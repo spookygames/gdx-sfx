@@ -21,7 +21,7 @@ dependencies {
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
     natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
-    implementation 'games.spooky.gdx:gdx-nativefilechooser-android:1.0.0'
+    implementation 'games.spooky.gdx:gdx-nativefilechooser-android:2.0.0'
 }
 
 android {
@@ -99,7 +99,7 @@ task defineAdbPath {
 }
 
 task run(type: Exec, dependsOn: defineAdbPath) {
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'net.spookygames.gdx.sfx.demo/net.spookygames.gdx.sfx.demo.GdxSfxDemoAndroid'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'games.spooky.gdx.sfx.demo/games.spooky.gdx.sfx.demo.GdxSfxDemoAndroid'
     
     doLast{
         if (execResult.exitValue != 0) {

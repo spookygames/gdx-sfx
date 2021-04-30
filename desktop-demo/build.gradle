@@ -9,7 +9,7 @@ targetCompatibility = 1.6
 dependencies {
     compile project(':core-demo')
     compile project(':desktop')
-    compile "games.spooky.gdx:gdx-nativefilechooser-desktop:1.0.0"
+    compile "games.spooky.gdx:gdx-nativefilechooser-desktop:2.0.0"
 }
 
 archivesBaseName = "$libName-${project.name}"
@@ -19,7 +19,7 @@ jar {
     from {configurations.compile.collect {zipTree(it)}}
 
     manifest {
-        attributes 'Main-Class': "net.spookygames.gdx.sfx.demo.GdxSfxDemoDesktop"
+        attributes 'Main-Class': "games.spooky.gdx.sfx.demo.GdxSfxDemoDesktop"
     }
 }
 

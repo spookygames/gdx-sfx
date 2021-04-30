@@ -8,7 +8,7 @@ targetCompatibility = 1.6
 
 dependencies {
     compile project(':core')
-    compile "games.spooky.gdx:gdx-nativefilechooser:1.0.0"
+    compile "games.spooky.gdx:gdx-nativefilechooser:2.0.0"
 }
 
 archivesBaseName = "$libName-${project.name}"
