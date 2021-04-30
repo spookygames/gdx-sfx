@@ -13,5 +13,5 @@ buildscript {
 apply plugin: nl.javadude.gradle.plugins.license.LicensePlugin
 
 license {
-    header = file('../LICENSE')
+  header = file("$rootDir/LICENSE")
 }

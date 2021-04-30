@@ -1,0 +1,79 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+task sourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    if (project.plugins.findPlugin("com.android.library")) {
+        from android.sourceSets.main.java.srcDirs
+    } else {
+        from sourceSets.main.allSource
+    }
+}
+
+task javadocJar (type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set('javadoc')
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+
+                artifactId archivesBaseName
+
+                if (project.plugins.findPlugin("com.android.library")) {
+                    from components.release
+                } else {
+                    from components.java
+                }
+
+                artifact sourcesJar
+                artifact javadocJar
+
+                pom {
+                    name = libName
+                    description = 'More to audio on libgdx'
+                    url = 'https://github.com/spookygames/gdx-sfx'
+                    licenses {
+                        license {
+                            name = 'MIT License'
+                            url = 'https://github.com/spookygames/gdx-sfx/blob/master/LICENSE'
+                        }
+                    }
+                    organization {
+                        name = 'Spooky Games'
+                        url = 'https://www.spooky.games'
+                    }
+                    developers {
+                        developer {
+                            id = 'arthurtemple'
+                            name = 'Arthur Templé'
+                            email = 'arthur.temple@gmail.com'
+                            organization = 'Spooky Games'
+                            organizationUrl = 'https://www.spooky.games'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:github.com/spookygames/gdx-sfx.git'
+                        developerConnection = 'scm:git:ssh://github.com/spookygames/gdx-sfx.git'
+                        url = 'https://github.com/spookygames/gdx-sfx'
+                    }
+                }
+            }
+        }
+    }
+}
+
+ext["signing.keyId"] = rootProject.ext["signing.keyId"]
+ext["signing.password"] = rootProject.ext["signing.password"]
+ext["signing.secretKeyRingFile"] = rootProject.ext["signing.secretKeyRingFile"]
+
+signing {
+    sign publishing.publications
+}

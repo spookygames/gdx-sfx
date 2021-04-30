@@ -8,10 +8,9 @@ targetCompatibility = 1.6
 
 dependencies {
     compile project(':core')
-    compile "net.spookygames.gdx:gdx-nativefilechooser:1.0.0"
+    compile "games.spooky.gdx:gdx-nativefilechooser:1.0.0"
 }
 
 archivesBaseName = "$libName-${project.name}"
 
-apply from: '../license.gradle'
 license.includes(["**/*.java"])

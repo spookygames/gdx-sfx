@@ -21,15 +21,9 @@ However, it is currently in use in several in-house projects and as such, despit
 Add the pretty **bold** parts into your _build.gradle_ file:
 
 <pre>
-    repositories {
-        <b>maven { url "http://dl.bintray.com/spookygames/oss" }</b>
-    }
-    
-    ...
-    
     allprojects {
         ext {
-            <b>gdxsfxVersion = '2.1.1'</b>
+            <b>gdxSfxVersion = '2.1.1'</b>
         }
     }
     
@@ -40,7 +34,7 @@ Add the pretty **bold** parts into your _build.gradle_ file:
         dependencies {
             compile project(":core")
             ...
-            <b>compile "net.spookygames.gdx:gdx-sfx-desktop:$gdxsfxVersion"</b>
+            <b>compile "net.spookygames.gdx:gdx-sfx-desktop:$gdxSfxVersion"</b>
         }
     }
     
@@ -51,7 +45,7 @@ Add the pretty **bold** parts into your _build.gradle_ file:
         dependencies {
             compile project(":core")
             ...
-            <b>compile "net.spookygames.gdx:gdx-sfx-android:$gdxsfxVersion"</b>
+            <b>compile "net.spookygames.gdx:gdx-sfx-android:$gdxSfxVersion"</b>
         }
     }
     
@@ -61,7 +55,7 @@ Add the pretty **bold** parts into your _build.gradle_ file:
         
         dependencies {
             ...
-            <b>compile "net.spookygames.gdx:gdx-sfx:$gdxsfxVersion"</b>
+            <b>compile "net.spookygames.gdx:gdx-sfx:$gdxSfxVersion"</b>
         }
     }
 </pre>

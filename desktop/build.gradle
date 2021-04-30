@@ -12,41 +12,8 @@ dependencies {
     compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 }
 
-apply plugin: 'maven-publish'
-
 archivesBaseName = "$libName-${project.name}"
 
-// Javadoc
-task javadocJar (type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-// Sources
-task sourcesJar (type : Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            artifactId "$libName-${project.name}"
-            from components.java
-
-            artifact sourcesJar
-            artifact javadocJar
-        }
-    }
-}
-
-apply from: '../license.gradle'
 license.includes(["**/*.java"])
 
-apply from: '../publish.gradle'
-bintray.publications = ['maven']
+apply from: "${rootProject.projectDir}/gradle/publish-module.gradle"

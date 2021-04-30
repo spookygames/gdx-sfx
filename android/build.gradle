@@ -1,15 +1,8 @@
-import com.android.builder.core.BuilderConstants
-
-plugins {
-    id "com.github.dcendents.android-maven" version "2.1"
-}
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion '28.0.3'
 
     defaultConfig {
         minSdkVersion 14
@@ -46,102 +39,6 @@ task javadoc(type: Javadoc) {
     failOnError false
 }
 
-// Javadoc
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-// Sources
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from android.sourceSets.main.java.srcDirs
-}
-
-// Thanks to http://stackoverflow.com/questions/19307341/android-library-gradle-release-jar
-android.libraryVariants.all { variant ->
-    def name = variant.buildType.name
-    if (name == BuilderConstants.DEBUG) {
-        return // Skip debug builds.
-    }
-    def task = project.tasks.create "jar${name.capitalize()}", Jar
-    task.dependsOn variant.javaCompile
-    task.from variant.javaCompile.destinationDir
-    artifacts.add('archives', task)
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
-
-eclipse {
-    sourceSets {
-        main {
-            java.srcDirs 'src/main/java', 'gen'
-        }
-    }
-
-    jdt {
-        sourceCompatibility = 1.6
-        targetCompatibility = 1.6
-    }
-
-    classpath {
-        plusConfigurations += [project.configurations.compile]
-        containers 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK', 'com.android.ide.eclipse.adt.LIBRARIES'
-    }
-
-    project {
-        natures 'com.android.ide.eclipse.adt.AndroidNature'
-        buildCommands.clear()
-        buildCommand "com.android.ide.eclipse.adt.ResourceManagerBuilder"
-        buildCommand "com.android.ide.eclipse.adt.PreCompilerBuilder"
-        buildCommand "org.eclipse.jdt.core.javabuilder"
-        buildCommand "com.android.ide.eclipse.adt.ApkBuilder"
-    }
-}
-
-idea {
-    module {
-        sourceDirs += file("src/main/java")
-        scopes = [COMPILE: [plus: [project.configurations.compile]]]
-
-        iml {
-            withXml {
-                def node = it.asNode()
-                def builder = NodeBuilder.newInstance()
-                builder.current = node
-                builder.component(name: "FacetManager") {
-                    facet(type: "android", name: "Android") {
-                        configuration {
-                            option(name: "UPDATE_PROPERTY_FILES", value: "true")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-apply from: '../license.gradle'
 license.excludes(["**/*.xml", "**/BuildConfig.java", "**/R.java"])
 
-apply from: '../publish.gradle'
-bintray.configurations = ['archives']
-bintrayUpload.dependsOn build
-
-task createPom {
-    doLast {
-        pom {
-            project {
-                packaging 'aar'
-                artifactId project.archivesBaseName
-            }
-        }.writeTo("$buildDir/poms/pom-default.xml")
-    }
-}
-build.dependsOn createPom
-
-task publishToMavenLocal (dependsOn: install) {
-}
+apply from: "${rootProject.projectDir}/gradle/publish-module.gradle"
