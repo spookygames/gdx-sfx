@@ -23,7 +23,7 @@ Add the pretty **bold** parts into your _build.gradle_ file:
 <pre>
     allprojects {
         ext {
-            <b>gdxSfxVersion = '2.1.1'</b>
+            <b>gdxSfxVersion = '3.0.0'</b>
         }
     }
     

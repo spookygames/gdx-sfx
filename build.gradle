@@ -16,7 +16,7 @@ plugins {
 allprojects {
 
     group = 'games.spooky.gdx'
-    version = '2.1.1'
+    version = '3.0.0'
 
     ext {
         gdxVersion = '1.8.0'
