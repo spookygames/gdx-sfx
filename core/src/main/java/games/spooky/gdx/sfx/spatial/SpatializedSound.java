@@ -32,7 +32,17 @@ public class SpatializedSound<T> implements Poolable {
 	private long id;
 	private float duration;
 	private T position;
+
+	/** 
+	 * Intrinsic volume of this sound, set at init, and multiples all subsequent volumes.
+	 * This allows us to dynamically change the volume of a sound at runtime without
+	 * having to modify the source file directly.
+	 **/
+	private float intrinsicVolume;
+
+	/** current (realtime) volume of this sound, modified when spatializing */
 	private float volume;
+	
 	private float pitch;
 	private float pan;
 
@@ -54,6 +64,7 @@ public class SpatializedSound<T> implements Poolable {
 		position = null;
 
 		volume = 1f;
+		intrinsicVolume = 1f;
 		pitch = 1f;
 		pan = 0f;
 
@@ -63,16 +74,22 @@ public class SpatializedSound<T> implements Poolable {
 		looping = false;
 	}
 
-	public long initialize(Sound sound, float duration, T position, float volume, float pitch, float panning) {
+	public long initialize(Sound sound, float duration, T position, float volume, float pitch, float panning, float intrinsicVolume) {
 		this.sound = sound;
 		this.duration = duration;
+		this.intrinsicVolume = intrinsicVolume;
+		this.volume = volume;
+		this.pitch = pitch;
+		this.pan = panning;
 
 		this.position = position;
 
 		this.elapsed = 0f;
 
 		running = true;
-		return this.id = sound.play(this.volume = volume, this.pitch = pitch, this.pan = panning);
+		
+		float effectiveVolume = this.volume * this.intrinsicVolume;		
+		return this.id = sound.play(effectiveVolume, this.pitch, this.pan);
 	}
 
 	public long getId() {
@@ -106,26 +123,42 @@ public class SpatializedSound<T> implements Poolable {
 		}
 	}
 
+	/** Get the current (realtime) volume of this sound. */
 	public float getVolume() {
 		return this.volume;
 	}
 
+    /**
+     * Set the realtime volume of this sound.
+     * @param volume multiplied by {@link #intrinsicVolume} to get an effective realtime volume
+     */
 	public void setVolume(float volume) {
-		if (this.volume != volume) {
-			this.volume = volume;
-			sound.setVolume(id, volume);
+	    float effectiveVolume = volume * this.intrinsicVolume;
+		if (this.volume != effectiveVolume) {
+			this.volume = effectiveVolume;
+			sound.setVolume(id, effectiveVolume);
 		}
 	}
+	
+	/** Get the intrinsic volume of this sound, which is multiplied against all subsequent volume changes */ 
+    public float getIntrinsicVolume() {
+        return this.intrinsicVolume;
+    }
 
 	public float getPan() {
 		return this.pan;
 	}
 
+	/**
+	 * Set the realtime pan and volume of this sound.
+	 * @param volume multiplied by {@link #intrinsicVolume} to get an effective realtime volume
+	 */
 	public void setPan(float pan, float volume) {
-		if (this.pan != pan || this.volume != volume) {
+	    float effectiveVolume = volume * this.intrinsicVolume;
+		if (this.pan != pan || this.volume != effectiveVolume) {
 			this.pan = pan;
-			this.volume = volume;
-			sound.setPan(id, pan, volume);
+			this.volume = effectiveVolume;
+			sound.setPan(id, pan, effectiveVolume);
 		}
 	}
 

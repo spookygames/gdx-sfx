@@ -63,17 +63,24 @@ public class SpatializedSoundPlayer<T> {
 	}
 
 	public long play(T position, SfxSound sound) {
-		return play(position, sound, 1f, false);
+		return play(position, sound, 1f, 1f, false);
+	}
+	
+	public long play(T position, SfxSound sound, float pitch, boolean looping) {
+	    return play(position, sound, 1f, pitch, looping);
 	}
 
-	public long play(T position, SfxSound sound, float pitch, boolean looping) {
+	/**
+	 * @param intrinsicVolume intrinsic volume of this sound, set at init, and multiples all subsequent volumes
+	 */
+	public long play(T position, SfxSound sound, float intrinsicVolume, float pitch, boolean looping) {
 		SpatializedSound<T> instance = pool.obtain();
 
 		float duration = sound.getDuration();
 
 		Spatializer<T> spatializer = this.spatializer;
 
-		long id = instance.initialize(sound, duration, position, 0f, pitch, 0f);
+		long id = instance.initialize(sound, duration, position, 0f, pitch, 0f, intrinsicVolume);
 
 		if (id == -1) {
 			pool.free(instance);

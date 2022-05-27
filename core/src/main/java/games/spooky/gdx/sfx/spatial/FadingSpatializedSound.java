@@ -43,8 +43,8 @@ public class FadingSpatializedSound<T> extends SpatializedSound<T> {
 		realVolume = 0;
 	}
 
-	public long initialize(Sound sound, float duration, T position, float volume, float pitch, float panning, float fadeTime, boolean fadeIn) {
-		long id = super.initialize(sound, duration, position, volume, pitch, panning);
+	public long initialize(Sound sound, float duration, T position, float volume, float pitch, float panning, float intrinsicVolume, float fadeTime, boolean fadeIn) {
+		long id = super.initialize(sound, duration, position, volume, pitch, panning, intrinsicVolume);
 
 		this.fadeTime = fadeTime;
 
@@ -59,7 +59,8 @@ public class FadingSpatializedSound<T> extends SpatializedSound<T> {
 		return fadeProgress > -1;
 	}
 
-	public void setVolume(float volume) {
+	@Override
+    public void setVolume(float volume) {
 		// setup correct target volume we got from spatialize
 		if (elapsed == 0 && fadeProgress > -1) {
 			realVolume = volume;
@@ -68,6 +69,7 @@ public class FadingSpatializedSound<T> extends SpatializedSound<T> {
 		}
 	}
 
+    @Override
 	public void setPan(float pan, float volume) {
 		// setup correct target volume we got from spatialize
 		if (elapsed == 0 && fadeProgress > -1) {
