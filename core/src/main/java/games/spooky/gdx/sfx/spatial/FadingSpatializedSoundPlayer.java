@@ -52,7 +52,7 @@ public class FadingSpatializedSoundPlayer<T> extends SpatializedSoundPlayer<T> {
 
 		Spatializer<T> spatializer = this.spatializer;
 
-		long id = instance.initialize(sound, duration, position, 0f, pitch, 0f,	fadeTime, fadeIn);
+		long id = instance.initialize(sound, looping, duration, position, 0f, pitch, 0f,	fadeTime, fadeIn);
 
 		if (id == -1) {
 			pool.free(instance);

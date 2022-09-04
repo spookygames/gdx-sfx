@@ -43,8 +43,8 @@ public class FadingSpatializedSound<T> extends SpatializedSound<T> {
 		realVolume = 0;
 	}
 
-	public long initialize(Sound sound, float duration, T position, float volume, float pitch, float panning, float fadeTime, boolean fadeIn) {
-		long id = super.initialize(sound, duration, position, volume, pitch, panning);
+	public long initialize(Sound sound, boolean looping, float duration, T position, float volume, float pitch, float panning, float fadeTime, boolean fadeIn) {
+		long id = super.initialize(sound, looping, duration, position, volume, pitch, panning);
 
 		this.fadeTime = fadeTime;
 
