@@ -7,9 +7,9 @@ targetCompatibility = 1.6
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 dependencies {
-    compile project(':core-demo')
-    compile project(':desktop')
-    compile "games.spooky.gdx:gdx-nativefilechooser-desktop:2.0.0"
+    implementation project(':core-demo')
+    implementation project(':desktop')
+    implementation "games.spooky.gdx:gdx-nativefilechooser-desktop:2.0.0"
 }
 
 archivesBaseName = "$libName-${project.name}"

@@ -2,11 +2,10 @@
 buildscript {
     repositories {
         mavenCentral()
-        jcenter()
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:7.0.4'
     }
 }
 
@@ -25,13 +24,13 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "games.spooky.gdx.sfx"
         minSdkVersion 14
-        targetSdkVersion 28
+        targetSdkVersion 29
     }
     
     compileOptions {
@@ -102,7 +101,7 @@ task run(type: Exec, dependsOn: defineAdbPath) {
     commandLine "$adb", 'shell', 'am', 'start', '-n', 'games.spooky.gdx.sfx.demo/games.spooky.gdx.sfx.demo.GdxSfxDemoAndroid'
     
     doLast{
-        if (execResult.exitValue != 0) {
+        if (executionResult.exitValue != 0) {
             logger.error("It probably failed!")
         }
     }
