@@ -1,15 +1,15 @@
 
 apply plugin: 'java'
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 8
+targetCompatibility = 8
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 dependencies {
     implementation project(':core-demo')
     implementation project(':desktop')
-    implementation "games.spooky.gdx:gdx-nativefilechooser-desktop:2.0.0"
+    implementation "games.spooky.gdx:gdx-nativefilechooser-desktop:2.1.0"
 }
 
 archivesBaseName = "$libName-${project.name}"
