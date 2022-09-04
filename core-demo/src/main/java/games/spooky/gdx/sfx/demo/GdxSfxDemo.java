@@ -96,9 +96,9 @@ public class GdxSfxDemo implements ApplicationListener {
 	@Override
 	public void create() {
 
-		/******************/
-		/* Initialization */
-		/******************/
+		/* **************** */
+		/*  Initialization  */
+		/* **************** */
 		
 		prefs = Gdx.app.getPreferences("GdxSfxDemo");
 
@@ -116,9 +116,9 @@ public class GdxSfxDemo implements ApplicationListener {
 		fadein = new FadeIn();
 		fadeout = new FadeOut();
 
-		/************/
-		/* Playlist */
-		/************/
+		/* ********** */
+		/*  Playlist  */
+		/* ********** */
 
 		final VerticalGroup playlistGroup = new VerticalGroup();
 		playlistGroup.fill().left();
@@ -130,9 +130,9 @@ public class GdxSfxDemo implements ApplicationListener {
 		scrollablePlaylistTable.setScrollingDisabled(true, false);
 		scrollablePlaylistTable.setOverscroll(false, false);
 
-		/********/
-		/* File */
-		/********/
+		/* ****** */
+		/*  File  */
+		/* ****** */
 
 		Button fileFinder = new TextButton("Add music", skin, "round");
 		fileFinder.addListener(new ChangeListener() {
@@ -178,8 +178,7 @@ public class GdxSfxDemo implements ApplicationListener {
 						parameters.title = file.name();
 						parameters.loadedCallback = new LoadedCallback() {
 							@Override
-							public void finishedLoading(AssetManager assetManager, String fileName, 
-									@SuppressWarnings("rawtypes") Class type) {
+							public void finishedLoading(AssetManager assetManager, String fileName, Class type) {
 								final SfxMusic music = assetManager.get(fileName, SfxMusic.class);
 								player.addMusic(music);
 								final MusicWidget widget = new MusicWidget(skin, music);
@@ -208,9 +207,9 @@ public class GdxSfxDemo implements ApplicationListener {
 			}
 		});
 
-		/***********/
-		/* Control */
-		/***********/
+		/* ********* */
+		/*  Control  */
+		/* ********* */
 
 		playPauseButton = new Button(skin, "music");
 		playPauseButton.addListener(new ChangeListener() {
@@ -296,13 +295,12 @@ public class GdxSfxDemo implements ApplicationListener {
 		final Label fadeDurationLabel = new Label("0.0s", skin);
 		final Slider fadeDurationSlider = new Slider(0.1f, 5f, 0.1f, false, skin);
 		fadeDurationSlider.addListener(new ChangeListener() {
-			String format = "%.1fs";
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				float value = fadeDurationSlider.getValue();
 				fadein.setDuration(value);
 				fadeout.setDuration(value);
-				fadeDurationLabel.setText(String.format(format, value));
+				fadeDurationLabel.setText(String.format(Locale.ROOT, "%.1fs", value));
 			}
 		});
 		fadeDurationSlider.setValue(2f);
@@ -384,9 +382,9 @@ public class GdxSfxDemo implements ApplicationListener {
 		controlTable.add(leftControlTable);
 		controlTable.add(rightControlTable);
 
-		/*********/
-		/* Debug */
-		/*********/
+		/* ******* */
+		/*  Debug  */
+		/* ******* */
 		
 		Label debugLabel = new Label("", skin) {
 			@Override
@@ -396,9 +394,9 @@ public class GdxSfxDemo implements ApplicationListener {
 			}
 		};
 
-		/***************/
-		/* Stage setup */
-		/***************/
+		/* ************* */
+		/*  Stage setup  */
+		/* ************* */
 
 		Table rootTable = new Table(skin);
 		rootTable.setFillParent(true);
@@ -414,9 +412,9 @@ public class GdxSfxDemo implements ApplicationListener {
 		stage = new Stage(new ScreenViewport(camera), batch);
 		stage.addActor(rootTable);
 
-		/*********/
-		/* Input */
-		/*********/
+		/* ******* */
+		/*  Input  */
+		/* ******* */
 
 		Gdx.input.setInputProcessor(stage);
 	}
@@ -513,9 +511,9 @@ public class GdxSfxDemo implements ApplicationListener {
 				}
 				float position = music.getPosition();
 				timeProgress.setValue(position);
-				timeLabel.setText(String.format("%.0f/%.0f", position, music.getDuration()));
-				volumeLevel.setText(String.format("vol: %.0f%%", music.getVolume() * 100f));
-				panLevel.setText(String.format("pan: %.2f", music.getPan()));
+				timeLabel.setText(String.format(Locale.ROOT, "%.0f/%.0f", position, music.getDuration()));
+				volumeLevel.setText(String.format(Locale.ROOT, "vol: %.0f%%", music.getVolume() * 100f));
+				panLevel.setText(String.format(Locale.ROOT, "pan: %.2f", music.getPan()));
 			} else if (wasPlaying) {
 				wasPlaying = false;
 				playingLabel.setVisible(false);

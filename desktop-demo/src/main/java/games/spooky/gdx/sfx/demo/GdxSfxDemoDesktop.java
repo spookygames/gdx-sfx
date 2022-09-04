@@ -29,7 +29,7 @@ import games.spooky.gdx.nativefilechooser.desktop.DesktopFileChooser;
 import games.spooky.gdx.sfx.desktop.DesktopAudioDurationResolver;
 
 public class GdxSfxDemoDesktop {
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		DesktopAudioDurationResolver.initialize();
 		new LwjglApplication(new GdxSfxDemo(new DesktopFileChooser()), "", 1200, 800);
 	}

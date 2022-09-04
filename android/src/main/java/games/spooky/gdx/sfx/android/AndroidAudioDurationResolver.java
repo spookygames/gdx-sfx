@@ -53,15 +53,10 @@ public class AndroidAudioDurationResolver implements MusicDurationResolver, Soun
 	@SuppressLint("NewApi")
 	@Override
 	public float resolveSoundDuration(Sound sound, FileHandle soundFile) {
-		// TODO Change the world, make this happen
-		// return ((AndroidSound)sound).getDuration();
-
-		if (Build.VERSION.SDK_INT >= 10) {
-			try {
-				return sdk10Duration(soundFile);
-			} catch (Exception ex) {
-				Gdx.app.error("gdx-sfx", "Unable to resolve duration of sound file " + soundFile.toString(), ex);
-			}
+		try {
+			return sdk10Duration(soundFile);
+		} catch (Exception ex) {
+			Gdx.app.error("gdx-sfx", "Unable to resolve duration of sound file " + soundFile.toString(), ex);
 		}
 
 		return -1f;

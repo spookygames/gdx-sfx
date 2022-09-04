@@ -54,28 +54,25 @@ public class DesktopAudioDurationResolver implements MusicDurationResolver, Soun
 
 	@Override
 	public float resolveMusicDuration(Music music, FileHandle musicFile) {
-		// TODO Change the world, make this happen
-		// return ((OpenALMusic) music).duration();
-
 		if (music instanceof Wav.Music) {
 			try {
 				return wavDuration(musicFile);
 			} catch (UnsupportedAudioFileException e) {
-				Gdx.app.error("gdx-sfx", "Unable to resolve duration of wav file " + musicFile.toString(), e);
+				Gdx.app.error("gdx-sfx", "Unable to resolve duration of wav file " + musicFile, e);
 			} catch (IOException e) {
-				Gdx.app.error("gdx-sfx", "Unable to resolve duration of wav file " + musicFile.toString(), e);
+				Gdx.app.error("gdx-sfx", "Unable to resolve duration of wav file " + musicFile, e);
 			}
 		} else if (music instanceof Mp3.Music) {
 			try {
 				return mp3Duration(musicFile);
 			} catch (BitstreamException e) {
-				Gdx.app.error("gdx-sfx", "Unable to resolve duration of mp3 file " + musicFile.toString(), e);
+				Gdx.app.error("gdx-sfx", "Unable to resolve duration of mp3 file " + musicFile, e);
 			}
 		} else if (music instanceof Ogg.Music) {
 			try {
 				return oggDuration(musicFile);
 			} catch (JOrbisException e) {
-				Gdx.app.error("gdx-sfx", "Unable to resolve duration of ogg file " + musicFile.toString(), e);
+				Gdx.app.error("gdx-sfx", "Unable to resolve duration of ogg file " + musicFile, e);
 			}
 		}
 
@@ -86,8 +83,7 @@ public class DesktopAudioDurationResolver implements MusicDurationResolver, Soun
 		AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(musicFile.file());
 		AudioFormat format = audioInputStream.getFormat();
 		long frames = audioInputStream.getFrameLength();
-		float durationInSeconds = frames / format.getFrameRate();
-		return durationInSeconds;
+		return frames / format.getFrameRate();
 	}
 
 	private float mp3Duration(FileHandle musicFile) throws BitstreamException {
@@ -98,12 +94,11 @@ public class DesktopAudioDurationResolver implements MusicDurationResolver, Soun
 		if ((streamPos > 0) && (length != AudioSystem.NOT_SPECIFIED) && (streamPos < length))
 			length -= streamPos;
 		float totalMilliseconds = header.total_ms(length);
-		float durationInSeconds = totalMilliseconds / 1000f;
-		return durationInSeconds;
+		return totalMilliseconds / 1000f;
 	}
 
 	private float oggDuration(FileHandle musicFile) throws JOrbisException {
-		String path = null;
+		String path;
 		File file = musicFile.file();
 		FileHandle tmpFile = null;
 		

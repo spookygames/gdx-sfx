@@ -72,7 +72,7 @@ public class SpatializedSound<T> implements Poolable {
 		this.elapsed = 0f;
 
 		running = true;
-if (looping) {
+		if (looping) {
 			return this.id = sound.loop(this.volume = volume, this.pitch = pitch, this.pan = panning);
 		} else {
 			return this.id = sound.play(this.volume = volume, this.pitch = pitch, this.pan = panning);
