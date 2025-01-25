@@ -5,7 +5,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.4'
+        classpath 'com.android.tools.build:gradle:7.4.2'
     }
 }
 
@@ -24,13 +24,13 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '28.0.3'
+    namespace "games.spooky.gdx.sfx.demo"
+    compileSdk 34
 
     defaultConfig {
         applicationId "games.spooky.gdx.sfx"
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 34
     }
     
     compileOptions {
