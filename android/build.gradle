@@ -39,6 +39,4 @@ task javadoc(type: Javadoc) {
     failOnError false
 }
 
-license.excludes(["**/*.xml", "**/BuildConfig.java", "**/R.java"])
-
 apply from: "${rootProject.projectDir}/gradle/publish-module.gradle"

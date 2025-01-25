@@ -24,5 +24,3 @@ jar {
         attributes 'Main-Class': "games.spooky.gdx.sfx.demo.GdxSfxDemoDesktop"
     }
 }
-
-license.includes(["**/*.java"])

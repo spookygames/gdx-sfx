@@ -106,5 +106,3 @@ task run(type: Exec, dependsOn: defineAdbPath) {
         }
     }
 }
-
-license.excludes(["**/*.xml", "**/BuildConfig.java"])

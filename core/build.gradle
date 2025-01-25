@@ -12,6 +12,4 @@ dependencies {
 
 archivesBaseName = "$libName"
 
-license.includes(["**/*.java"])
-
 apply from: "${rootProject.projectDir}/gradle/publish-module.gradle"

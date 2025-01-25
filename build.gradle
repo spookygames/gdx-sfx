@@ -28,8 +28,4 @@ allprojects {
     }
 }
 
-subprojects {
-    apply from: "$rootDir/gradle/license.gradle"
-}
-
 apply from: "${rootDir}/gradle/publish-root.gradle"

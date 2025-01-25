@@ -12,5 +12,3 @@ dependencies {
 }
 
 archivesBaseName = "$libName-${project.name}"
-
-license.includes(["**/*.java"])
