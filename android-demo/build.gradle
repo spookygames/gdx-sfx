@@ -34,8 +34,8 @@ android {
     }
     
     compileOptions {
-        sourceCompatibility = 1.6
-        targetCompatibility = 1.6
+        sourceCompatibility = 7
+        targetCompatibility = 7
     }
     
     sourceSets {
@@ -51,8 +51,8 @@ android {
     }
 }
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 7
+targetCompatibility = 7
 
 // called every time gradle gets executed, takes the native dependencies of
 // the natives configuration, and extracts them to the proper libs/ folders
