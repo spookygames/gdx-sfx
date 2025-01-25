@@ -23,7 +23,8 @@
  */
 package games.spooky.gdx.sfx.demo;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
 import games.spooky.gdx.nativefilechooser.desktop.DesktopFileChooser;
 import games.spooky.gdx.sfx.desktop.DesktopAudioDurationResolver;
@@ -31,6 +32,8 @@ import games.spooky.gdx.sfx.desktop.DesktopAudioDurationResolver;
 public class GdxSfxDemoDesktop {
 	public static void main(String[] args) {
 		DesktopAudioDurationResolver.initialize();
-		new LwjglApplication(new GdxSfxDemo(new DesktopFileChooser()), "", 1200, 800);
+		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+		config.setWindowedMode(1200, 800);
+		new Lwjgl3Application(new GdxSfxDemo(new DesktopFileChooser()), config);
 	}
 }

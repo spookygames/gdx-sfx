@@ -9,14 +9,16 @@ targetCompatibility = 8
 dependencies {
     implementation project(':core-demo')
     implementation project(':desktop')
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
     implementation "games.spooky.gdx:gdx-nativefilechooser-desktop:2.1.0"
 }
 
 archivesBaseName = "$libName-${project.name}"
 
 jar {
-    from files(sourceSets.main.output.classesDirs)
-    from {configurations.compile.collect {zipTree(it)}}
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    dependsOn configurations.runtimeClasspath
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 
     manifest {
         attributes 'Main-Class': "games.spooky.gdx.sfx.demo.GdxSfxDemoDesktop"
