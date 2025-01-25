@@ -37,7 +37,7 @@ public class SpatializedSoundPlayer<T> {
 		@Override
 		protected SpatializedSound<T> newObject() {
 			return SpatializedSoundPlayer.this.newObject();
-		};
+		}
 	};
 
 	protected final LongMap<SpatializedSound<T>> sounds = new LongMap<SpatializedSound<T>>();
@@ -97,8 +97,6 @@ public class SpatializedSoundPlayer<T> {
 	}
 
 	public void update(float delta) {
-		Spatializer<T> spatializer = this.spatializer;
-
 		Iterator<SpatializedSound<T>> iterator = sounds.values();
 		while (iterator.hasNext()) {
 			SpatializedSound<T> instance = iterator.next();

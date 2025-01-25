@@ -54,8 +54,6 @@ public class FadingSpatializedSoundPlayer<T> extends SpatializedSoundPlayer<T> {
 
 		float duration = sound.getDuration();
 
-		Spatializer<T> spatializer = this.spatializer;
-
 		long id = instance.initialize(sound, looping, duration, position, 0f, pitch, 0f,	intrinsicVolume, fadeTime, fadeIn);
 
 		if (id == -1) {
@@ -73,8 +71,6 @@ public class FadingSpatializedSoundPlayer<T> extends SpatializedSoundPlayer<T> {
 
 	@Override
 	public void update(float delta) {
-		Spatializer<T> spatializer = this.spatializer;
-
 		Iterator<SpatializedSound<T>> iterator = sounds.values();
 		while (iterator.hasNext()) {
 			SpatializedSound<T> instance = iterator.next();

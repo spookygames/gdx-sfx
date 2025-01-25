@@ -185,8 +185,7 @@ public class SfxMusicWrapper implements SfxMusic {
 	@Override
 	public boolean update(float deltaTime) {
 		if (isPlaying()) {
-			float position = this.position + deltaTime;
-			this.position = position;
+			this.position += deltaTime;
 			
 			// Apply effects
 			boolean effectsOver = true;
@@ -196,18 +195,18 @@ public class SfxMusicWrapper implements SfxMusic {
 			if (size > 0) {
 				for (int i = 0 ; i < size ; i++) {
 					SfxMusicEffect effect = effects.get(i);
-					effectsOver = effect.update(position) && effectsOver;
+					effectsOver = effect.update(this.position) && effectsOver;
 				}
 			}
 			
 			if (stopPending && effectsOver) {
 				doStop();
-				position = 0f;
+				this.position = 0f;
 				return true;
 			} else if (isLooping()) {
 				float duration = getDuration();
-				if (position > duration) {
-					position -= duration;
+				if (this.position > duration) {
+					this.position -= duration;
 					for (int i = 0 ; i < size ; i++) {
 						SfxMusicEffect effect = effects.get(i);
 						effect.restart();
