@@ -261,7 +261,7 @@ That's about it.
 
 ## Demo
 
-A demo for the `SfxMusicPlayer` is available under the _Releases_ tab and you are invited to take a look at the sources [here](core-demo/src/main/java/net/spookygames/gdx/sfx/demo/GdxSfxDemo.java).
+A demo for the `SfxMusicPlayer` is available under the _Releases_ tab and you are invited to take a look at the sources [here](core-demo/src/main/java/games/spooky/gdx/sfx/demo/GdxSfxDemo.java).
 
 ## Platform support
 
