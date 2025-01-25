@@ -123,7 +123,6 @@ public class SpatializedSoundPlayer<T> {
 
 		if (sound != null) {
 			sound.stop();
-			pool.free(sound);
 		}
 	}
 
